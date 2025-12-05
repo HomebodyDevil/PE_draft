@@ -1,5 +1,7 @@
 public static class ConstValue
 {
+    public const int MAX_LOOP = 5000;
+    
     public const float LINE_Z = 10f;
     public const float LINE_WIDTH = 0.1f;
     
@@ -13,4 +15,7 @@ public static class ConstValue
     public const float CARD_DRAW_SECONDS = 0.1f;
     public const float CARDVIEW_SPLINE_MIN = 0.001f;
     public const float CARDVIEW_ROTATE_MAX = 10f;
+
+    public const float DEFAULT_PLAYER_HEALTH = 10f;
+    public const float DEFAULT_PLAYER_COST = 5f;
 }

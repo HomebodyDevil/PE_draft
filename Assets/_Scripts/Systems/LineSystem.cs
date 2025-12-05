@@ -97,7 +97,6 @@ public class LineSystem : Singleton<LineSystem>
             
             SetEndPoint();
             
-            Debug.Log("Pressing");
             time += 0.05f;
             yield return new WaitForSeconds(0.01f);
         }

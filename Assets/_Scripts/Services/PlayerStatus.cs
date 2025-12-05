@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+[Serializable]
 public class PlayerStatus
 {
     public float CurrentHealth { get; set; }
@@ -10,9 +12,18 @@ public class PlayerStatus
     public List<Card> PlayerDeck { get; private set; } = new();
 
     public PlayerStatus(
-        PlayerStatusData data
+        PlayerStatusData data=null
     )
     {
+        if (data == null)
+        {
+            CurrentHealth = ConstValue.DEFAULT_PLAYER_HEALTH;
+            MaxHealth = ConstValue.DEFAULT_PLAYER_HEALTH;
+            MaxCost = ConstValue.DEFAULT_PLAYER_COST;
+
+            return;
+        }
+        
         CurrentHealth = data.MaxHealth;
         MaxHealth = data.MaxHealth;
         MaxCost = data.MaxCost;

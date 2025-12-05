@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Splines;
 
@@ -17,7 +18,8 @@ public class CardViewSystem : Singleton<CardViewSystem>
     [SerializeField] private RectTransform graveyardButtonRT;
     [SerializeField] private Canvas cardViewCanvas;
 
-    [SerializeField] private List<CardView> _cardViewList = new();
+    [SerializeField] private List<CardView> _usingCardViewList = new();
+    [SerializeField] private List<CardView> _storedCardViewList = new();
 
     private Coroutine _lineupCoroutine;
     
@@ -26,6 +28,16 @@ public class CardViewSystem : Singleton<CardViewSystem>
         base.Awake();
         VarSetup();
         Setup();
+    }
+
+    private void OnEnable()
+    {
+        PlayerCardSystem.Instance.OnDrawCard += OnDrawCard;
+    }
+
+    private void OnDisable()
+    {
+        PlayerCardSystem.Instance.OnDrawCard -= OnDrawCard;
     }
 
     // private void Start()
@@ -62,7 +74,7 @@ public class CardViewSystem : Singleton<CardViewSystem>
         if (cardView.TryGetComponent(out CardView cardViewComp))
         {
             cardView.GetComponent<RectTransform>().localScale = Vector3.zero;
-            _cardViewList.Add(cardViewComp);
+            _usingCardViewList.Add(cardViewComp);
 
             return cardViewComp;
         }
@@ -73,6 +85,31 @@ public class CardViewSystem : Singleton<CardViewSystem>
         }
     }
 
+    private void OnDrawCard(InBattleCard cardView)
+    {
+        // 1. cardView를 얻어온다 : 남은 게 있다면 사용. 없다면 생성.
+        //      -> CreateCardView
+    }
+
+    private CardView GetUseableCardView()
+    {
+        CardView ret = null;
+        
+        if (_storedCardViewList.Count > 0)
+        {
+            ret = _storedCardViewList[0];
+            
+            _usingCardViewList.Add(_storedCardViewList[0]);
+            _storedCardViewList.RemoveAt(0);
+        }
+        else
+        {
+            ret = CreateCardView(deckButtonRT.localPosition);
+        }
+
+        return ret;
+    }
+
     private void MoveCardToHand(RectTransform cardViewRT)
     {
         cardViewRT.DOLocalMove(graveyardButtonRT.localPosition, 0.5f);
@@ -80,7 +117,7 @@ public class CardViewSystem : Singleton<CardViewSystem>
 
     private IEnumerator LineUpHandCardViews()
     {
-        int cardNum = _cardViewList.Count;
+        int cardNum = _usingCardViewList.Count;
 
         float space = cardNum > ConstValue.MAX_HAND_CARDS
             ? (1f / (cardNum - 1))
@@ -90,7 +127,7 @@ public class CardViewSystem : Singleton<CardViewSystem>
         
         for (int i = 0; i < cardNum; i++)
         {
-            RectTransform cardViewRT = _cardViewList[i].GetComponent<RectTransform>();
+            RectTransform cardViewRT = _usingCardViewList[i].GetComponent<RectTransform>();
             if (cardViewRT == null)
             {
                 Debug.Log($"CardView[{i}] is null");

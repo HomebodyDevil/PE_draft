@@ -1,6 +1,24 @@
+using SerializeReferenceEditor;
 using UnityEngine;
 
 public class PlayerStatusService : PersistantSingleton<PlayerStatusService>
 {
-    public PlayerStatus PlayerStatus { get; private set; }
+    [field: SerializeField] public PlayerStatus PlayerStatus { get; private set; } = null;
+    [SerializeField] private PlayerStatusData defaultPayerStatusData;
+
+    protected override void Awake()
+    {
+        base.Awake();
+
+        // PlayerStatus를 세팅.
+        if (defaultPayerStatusData == null) SetupDefaultPlayerStatusData();
+        else PlayerStatus = new(defaultPayerStatusData);
+    }
+
+    private void SetupDefaultPlayerStatusData()
+    {
+        PlayerStatus.MaxHealth = ConstValue.DEFAULT_PLAYER_HEALTH;
+        PlayerStatus.CurrentHealth = ConstValue.DEFAULT_PLAYER_HEALTH;
+        PlayerStatus.MaxCost = ConstValue.DEFAULT_PLAYER_COST;
+    }
 }
