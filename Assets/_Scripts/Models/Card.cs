@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public enum CardType
+public enum ECardPlayType
 {
     Playable,
     Targetable,
@@ -8,12 +8,12 @@ public enum CardType
 
 public class Card
 {
-    public CardType type { get; private set; }
+    public ECardPlayType CardPlayType { get; private set; }
 
     public Card(
-        CardType type
+        ECardPlayType type
     )
     {
-        this.type = type;
+        this.CardPlayType = type;
     }
 }

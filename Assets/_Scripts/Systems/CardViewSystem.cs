@@ -7,6 +7,8 @@ using UnityEngine.Splines;
 
 public class CardViewSystem : Singleton<CardViewSystem>
 {
+    public Action OnCardViewCreated;
+    
     [SerializeField] private SplineContainer splineContainer;
     [SerializeField] private Camera cardViewCam;
     [SerializeField] private Transform cardViews;
@@ -17,6 +19,8 @@ public class CardViewSystem : Singleton<CardViewSystem>
 
     [SerializeField] private List<CardView> _cardViewList = new();
 
+    private Coroutine _lineupCoroutine;
+    
     protected override void Awake()
     {
         base.Awake();
@@ -26,8 +30,7 @@ public class CardViewSystem : Singleton<CardViewSystem>
 
     // private void Start()
     // {
-    //     CreateCardView(deckButtonRT.localPosition);
-    //     MoveCardToHand(_cardViewList[0].GetComponent<RectTransform>());
+    //     
     // }
 
     private void VarSetup()
@@ -93,8 +96,24 @@ public class CardViewSystem : Singleton<CardViewSystem>
                 Debug.Log($"CardView[{i}] is null");
                 continue;
             }
+            
+            float pos = firstCardPos + space * i;
+            float rot = -(2 * ConstValue.CARDVIEW_ROTATE_MAX * pos - ConstValue.CARDVIEW_ROTATE_MAX);
+                
+            Vector3 worldPos = splineContainer.EvaluatePosition(pos);
+            
+            cardViewRT.DOScale(Vector3.one, ConstValue.CARD_LINEUP_SECONDS);
+            cardViewRT.DORotate(new(0, 0, rot), ConstValue.CARD_LINEUP_SECONDS);
+            cardViewRT.DOMove(worldPos, ConstValue.CARD_LINEUP_SECONDS);
         }
 
         yield break;
+    }
+
+    public void CreateCardViewAddToHand()
+    {
+        CreateCardView(deckButtonRT.localPosition);
+        if (_lineupCoroutine != null) StopCoroutine(_lineupCoroutine);
+        _lineupCoroutine = StartCoroutine(LineUpHandCardViews());
     }
 }
