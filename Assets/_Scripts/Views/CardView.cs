@@ -1,20 +1,39 @@
 using System;
+using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, IDragHandler
+public class CardView : 
+    MonoBehaviour, 
+    IPointerDownHandler, 
+    IPointerUpHandler, 
+    IDragHandler, 
+    IBeginDragHandler,
+    IEndDragHandler,
+    IPointerEnterHandler, 
+    IPointerExitHandler
 {
     public InBattleCard _card { get; private set; }
 
     [SerializeField] public TextMeshProUGUI cardNameTMP;
     [SerializeField] public TextMeshProUGUI cardDescriptionTMP;
+
+    [SerializeField] private Transform _visuals;
     //[SerializeField] private TextMeshProUGUI costTMP;
+
+    private int _originalIndex = 0;
     
     private void Awake()
     {
         transform.AssignChildVar<TextMeshProUGUI>("CardNameText", ref cardNameTMP);
         transform.AssignChildVar<TextMeshProUGUI>("CardDescriptionText", ref cardDescriptionTMP);
+        transform.AssignChildVar<Transform>("Visuals", ref _visuals);
+    }
+
+    public void SetVisible(bool visible)
+    {
+        _visuals.gameObject.SetActive(visible);
     }
     
     public void SetCardView(InBattleCard card)
@@ -24,6 +43,13 @@ public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         SetCardViewNameText(card.BattleCard.Name);
         SetCardViewDescriptionText(card.BattleCard.Description);
         SetCardViewCostText(card.BattleCard.Cost);
+    }
+
+    public void SetCardViewVisuals(Card card)
+    {
+        SetCardViewNameText(card.Name);
+        SetCardViewDescriptionText(card.Description);
+        SetCardViewCostText(card.Cost);
     }
 
     public void SetCardViewNameText(String newName)
@@ -47,6 +73,16 @@ public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        _originalIndex = transform.GetSiblingIndex();
+        transform.SetAsLastSibling();
+        
+        if (HoveringCardViewSystem.Instance?._currentHoveringCard == _card.BattleCard)
+        {
+            HoveringCardViewSystem.Instance?.OnSetHoveringCardViewVisible?.Invoke(false);
+        }
+        
+        SetVisible(true);
+        
         switch (_card.BattleCard.CardPlayType)
         {
             case ECardPlayType.Playable:
@@ -86,19 +122,26 @@ public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
     
     private void OnPlayablePointerDown(PointerEventData eventData)
     {
-        Debug.Log("OnPlayablePointerDown");
+        transform.DORotate(Quaternion.identity.eulerAngles, ConstValue.CARD_POS_RESTORE_SECONDS);
     }
 
     private void OnTargetablePointerDown(PointerEventData eventData)
     {
         LineSystem.Instance?.SetVisible(true);
+        transform.DORotate(Quaternion.identity.eulerAngles, ConstValue.CARD_POS_RESTORE_SECONDS);
         LineSystem.Instance?.OnSetStartDrawLine?.Invoke(LineSystem.Instance.GetLinePointPosOfWorldPos(transform.position));
         LineSystem.Instance?.OnSetEndDrawLine?.Invoke(LineSystem.Instance.GetLinePointPosOfWorldPos(transform.position));
     }
     
     private void OnPlayablePointerUp(PointerEventData eventData)
     {
-        Debug.Log("OnPlayablePointerUp");
+        // 카드를 Play할 조건(일정 거리 이상 등등)이 만족되지 않았다면
+        // 본래 위치로 이동시킨다.
+        // transform.DOMove(_originalPosition, ConstValue.CARD_POS_RESTORE_SECONDS);
+        // transform.DORotate(_originalRotation.eulerAngles, ConstValue.CARD_POS_RESTORE_SECONDS);
+
+        CardViewSystem.Instance?.OnLineupCardViews?.Invoke();
+        transform.SetSiblingIndex(_originalIndex);
     }
 
     private void OnTargetablePointerUp(PointerEventData eventData)
@@ -107,11 +150,13 @@ public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         // 이후, BattleSystem의 Target을 초기화 한다.
         
         LineSystem.Instance?.SetVisible(false);
+        CardViewSystem.Instance?.OnLineupCardViews?.Invoke();
+        transform.SetSiblingIndex(_originalIndex);
     }
     
     private void OnPlayablePointerDrag(PointerEventData eventData)
     {
-        Debug.Log("OnPlayablePointerDrag");
+        transform.position = LineSystem.Instance.GetLinePointPosOfMousePos();
     }
 
     private void OnTargetablePointerDrag(PointerEventData eventData)
@@ -119,5 +164,38 @@ public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
         LineSystem.Instance?.OnSetEndDrawLine?.Invoke(LineSystem.Instance.GetLinePointPosOfMousePos());
         
         // 1. Raycast를 수행해서 BattleSystem의 Target을 설정할 수 있는지 확인한다.
+    }
+
+    public void OnPointerEnter(PointerEventData eventData)
+    {
+        if (HoveringCardViewSystem.Instance != null && HoveringCardViewSystem.Instance._dragging) return;
+        
+        HoveringCardViewSystem.Instance?.OnSetHoveringCardViewVisible?.Invoke(true);
+        HoveringCardViewSystem.Instance?.OnSetHoveringCardViewPos?.Invoke(transform.position);
+        HoveringCardViewSystem.Instance?.OnSetCurrentHoveringCard?.Invoke(_card.BattleCard);
+        
+        SetVisible(false);
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if (HoveringCardViewSystem.Instance != null && HoveringCardViewSystem.Instance._dragging) return;
+        
+        if (HoveringCardViewSystem.Instance?._currentHoveringCard == _card.BattleCard)
+        {
+            HoveringCardViewSystem.Instance?.OnSetHoveringCardViewVisible?.Invoke(false);
+        }
+        
+        SetVisible(true);
+    }
+
+    public void OnBeginDrag(PointerEventData eventData)
+    {
+        if (HoveringCardViewSystem.Instance != null) HoveringCardViewSystem.Instance._dragging = true;
+    }
+
+    public void OnEndDrag(PointerEventData eventData)
+    {
+        if (HoveringCardViewSystem.Instance != null) HoveringCardViewSystem.Instance._dragging = false;
     }
 }

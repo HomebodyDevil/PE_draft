@@ -131,6 +131,5 @@ public class PlayerCardSystem : Singleton<PlayerCardSystem>
         }
         
         MoveCardToGraveyard(Hand[index]);
-        Debug.Log($"TestMoveCardToGraveyard: {index}");
     }
 }

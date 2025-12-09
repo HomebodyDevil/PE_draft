@@ -10,6 +10,7 @@ using UnityEngine.Splines;
 public class CardViewSystem : Singleton<CardViewSystem>
 {
     public Action OnCardViewCreated;
+    public Action OnLineupCardViews;
     
     [SerializeField] private SplineContainer splineContainer;
     [SerializeField] private Camera cardViewCam;
@@ -36,12 +37,14 @@ public class CardViewSystem : Singleton<CardViewSystem>
     {
         PlayerCardSystem.Instance.OnDrawCard += DrawCardView;
         PlayerCardSystem.Instance.OnCardMoveToGraveyard += MoveCardViewToGraveyard;
+        OnLineupCardViews += LineUpHandCardViews;
     }
 
     private void OnDisable()
     {
         PlayerCardSystem.Instance.OnDrawCard -= DrawCardView;
         PlayerCardSystem.Instance.OnCardMoveToGraveyard -= MoveCardViewToGraveyard;
+        OnLineupCardViews -= LineUpHandCardViews;
     }
 
     private void Start()
@@ -123,6 +126,7 @@ public class CardViewSystem : Singleton<CardViewSystem>
                     
                     cardViewRT.DOScale(Vector3.zero, ConstValue.CARD_DRAW_SECONDS);
                     cardViewRT.DOMove(graveyardButtonRT.position, ConstValue.CARD_DRAW_SECONDS);
+                    cardViewRT.DORotate(Quaternion.identity.eulerAngles, ConstValue.CARD_DRAW_SECONDS);
                     
                     StartCoroutine(SetCardViewActiveCoroutine(cardViewRT.gameObject, false, ConstValue.CARD_DRAW_SECONDS));
                     
@@ -171,7 +175,6 @@ public class CardViewSystem : Singleton<CardViewSystem>
             cardViewRT.position = deckButtonRT.position;
         }
         
-        Debug.Log("AAAA");
         cardViewGO.SetActive(active);
     }
 
