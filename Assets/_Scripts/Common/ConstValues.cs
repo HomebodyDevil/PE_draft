@@ -2,8 +2,8 @@ public static class ConstValue
 {
     public const int MAX_LOOP = 5000;
     
-    public const float LINE_Z = 10f;
-    public const float LINE_WIDTH = 0.1f;
+    public const float LINE_Z = 100f;
+    public const float LINE_WIDTH = 1f;
     
     public const float UI_Z = 10f;
 

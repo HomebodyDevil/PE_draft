@@ -42,7 +42,7 @@ public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
     public void SetCardViewCostText(int newCost)
     {
-        Debug.Log($"SetCardViewCostText: {newCost}");
+        
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -91,7 +91,9 @@ public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
     private void OnTargetablePointerDown(PointerEventData eventData)
     {
-        Debug.Log("OnTargetablePointerDown");
+        LineSystem.Instance?.SetVisible(true);
+        LineSystem.Instance?.OnSetStartDrawLine?.Invoke(LineSystem.Instance.GetLinePointPosOfWorldPos(transform.position));
+        LineSystem.Instance?.OnSetEndDrawLine?.Invoke(LineSystem.Instance.GetLinePointPosOfWorldPos(transform.position));
     }
     
     private void OnPlayablePointerUp(PointerEventData eventData)
@@ -101,7 +103,10 @@ public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
     private void OnTargetablePointerUp(PointerEventData eventData)
     {
-        Debug.Log("OnTargetablePointerUp");
+        // BattleSystem의 Target이 있다면, 해당 Target들에 대한 카드 Effect를 수행한다.
+        // 이후, BattleSystem의 Target을 초기화 한다.
+        
+        LineSystem.Instance?.SetVisible(false);
     }
     
     private void OnPlayablePointerDrag(PointerEventData eventData)
@@ -111,6 +116,8 @@ public class CardView : MonoBehaviour, IPointerDownHandler, IPointerUpHandler, I
 
     private void OnTargetablePointerDrag(PointerEventData eventData)
     {
-        Debug.Log("OnTargetablePointerDrag");
+        LineSystem.Instance?.OnSetEndDrawLine?.Invoke(LineSystem.Instance.GetLinePointPosOfMousePos());
+        
+        // 1. Raycast를 수행해서 BattleSystem의 Target을 설정할 수 있는지 확인한다.
     }
 }

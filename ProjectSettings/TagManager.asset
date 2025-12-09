@@ -14,9 +14,9 @@ TagManager:
   - World
   - Line
   - Card
-  - 
-  - 
-  - 
+  - Enemy
+  - Player
+  - Friendly
   - 
   - 
   - 

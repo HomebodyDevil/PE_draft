@@ -15,7 +15,7 @@ public class ConfigService : PersistantSingleton<ConfigService>
         SetFrameRate(GameConfig.FrameRate);
     }
 
-    public void SetFrameRate(int FrameRate)
+    public void SetFrameRate(int FrameRate = 60)
     {
         Application.targetFrameRate = GameConfig.FrameRate = FrameRate;
     }

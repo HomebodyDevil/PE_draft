@@ -28,6 +28,8 @@ public class PlayerCardSystem : Singleton<PlayerCardSystem>
             
             Deck.Add(battleCard);
         }
+
+        Deck.Shuffle();
     }
 
     /// <summary>

@@ -7,10 +7,13 @@ using UnityEngine.UIElements;
 
 public class LineSystem : Singleton<LineSystem>
 {
+    public Action<Vector3> OnSetStartDrawLine;
+    public Action<Vector3> OnSetEndDrawLine;
+    
     [SerializeField] private LineRenderer lineView;
     [SerializeField] private Camera lineCamera;
 
-    private Plane _mouseRayPlane;
+    private Plane _rayPlane;
     private Coroutine _whileMousePressingCoroutine;
     private Coroutine _drawCurveCoroutine;
     
@@ -19,7 +22,7 @@ public class LineSystem : Singleton<LineSystem>
         base.Awake();
         Setup();
         
-        _mouseRayPlane = new Plane(lineCamera.transform.forward, new Vector3(0, 0, ConstValue.LINE_Z));
+        _rayPlane = new Plane(lineCamera.transform.forward, new Vector3(0, 0, ConstValue.LINE_Z));
     }
 
     private void Start()
@@ -37,22 +40,27 @@ public class LineSystem : Singleton<LineSystem>
 
     private void OnEnable()
     {
-        InputManager.Instance.PlayerActions.Default.MouseLeftButton.started += OnMouseLeftClickDown;
-        InputManager.Instance.PlayerActions.Default.MouseLeftButton.canceled += OnMouseLeftClickUp;
+        OnSetStartDrawLine += SetStartPoint;
+        OnSetEndDrawLine += SetEndPoint;
+        // InputManager.Instance.PlayerActions.Default.MouseLeftButton.started += OnMouseLeftClickDown;
+        // InputManager.Instance.PlayerActions.Default.MouseLeftButton.canceled += OnMouseLeftClickUp;
     }
     
     private void OnDisable()
     {
-        InputManager.Instance.PlayerActions.Default.MouseLeftButton.started -= OnMouseLeftClickDown;
-        InputManager.Instance.PlayerActions.Default.MouseLeftButton.canceled -= OnMouseLeftClickUp;
+        OnSetStartDrawLine -= SetStartPoint;
+        OnSetEndDrawLine -= SetEndPoint;
+        
+        // InputManager.Instance.PlayerActions.Default.MouseLeftButton.started -= OnMouseLeftClickDown;
+        // InputManager.Instance.PlayerActions.Default.MouseLeftButton.canceled -= OnMouseLeftClickUp;
     }
 
-    private void OnMouseLeftClickDown(InputAction.CallbackContext context)
-    {
-        SetVisible(true);
-        SetStartPoint();
-        _whileMousePressingCoroutine = StartCoroutine(WhilePressingCoroutine());
-    }
+    // private void OnMouseLeftClickDown(InputAction.CallbackContext context)
+    // {
+    //     SetVisible(true);
+    //     SetStartPoint();
+    //     _whileMousePressingCoroutine = StartCoroutine(WhilePressingCoroutine());
+    // }
     
     private void OnMouseLeftClickUp(InputAction.CallbackContext context)
     {
@@ -60,31 +68,42 @@ public class LineSystem : Singleton<LineSystem>
         if (_whileMousePressingCoroutine != null) StopCoroutine(_whileMousePressingCoroutine);
     }
 
-    private void SetVisible(bool visible)
+    public void SetVisible(bool visible)
     {
         lineView.enabled = visible;
     }
 
-    private void SetStartPoint()
+    private void SetStartPoint(Vector3 startPoint)
     {
-        lineView.SetPosition(0, GetMousePointWorldPos());
+        lineView.SetPosition(0, startPoint);
     }
     
-    private void SetEndPoint()
+    private void SetEndPoint(Vector3 endPoint)
     {
-        lineView.SetPosition(1, GetMousePointWorldPos());
+        lineView.SetPosition(1, endPoint);
     }
     
-    private Vector3 GetMousePointWorldPos()
+    public Vector3 GetLinePointPosOfMousePos()
     {
         Ray ray = lineCamera.ScreenPointToRay(Mouse.current.position.ReadValue());
         
-        if (_mouseRayPlane.Raycast(ray, out float distance))
+        if (_rayPlane.Raycast(ray, out float distance))
         {
             return ray.GetPoint(distance);
         }
         
         return Vector3.zero;
+    }
+
+    public Vector3 GetLinePointPosOfWorldPos(Vector3 worldPos)
+    {
+        Ray ray = new(lineCamera.transform.position, (worldPos - lineCamera.transform.position).normalized);
+        if (_rayPlane.Raycast(ray, out float distance))
+        {
+            return ray.GetPoint(distance);
+        }
+        
+        return default;
     }
 
     private IEnumerator WhilePressingCoroutine()
@@ -95,7 +114,7 @@ public class LineSystem : Singleton<LineSystem>
         {
             if (time > 60) yield break;
             
-            SetEndPoint();
+            SetEndPoint(GetLinePointPosOfMousePos());
             
             time += 0.05f;
             yield return new WaitForSeconds(0.01f);
@@ -110,7 +129,7 @@ public class LineSystem : Singleton<LineSystem>
         {
             if (time > 60) yield break;
             
-            SetEndPoint();
+            SetEndPoint(GetLinePointPosOfMousePos());
             
             Debug.Log("Pressing");
             time += 0.05f;
@@ -120,7 +139,7 @@ public class LineSystem : Singleton<LineSystem>
 
     public void StartDrawCurve()
     {
-        SetStartPoint();
+        SetStartPoint(GetLinePointPosOfMousePos());
         SetVisible(true);
         _drawCurveCoroutine = StartCoroutine(DrawCurveCoroutine());
     }
