@@ -164,6 +164,8 @@ public class CardView :
         LineSystem.Instance?.OnSetEndDrawLine?.Invoke(LineSystem.Instance.GetLinePointPosOfMousePos());
         
         // 1. Raycast를 수행해서 BattleSystem의 Target을 설정할 수 있는지 확인한다.
+        BattleSystem.Instance?.OnFindTarget.Invoke("Enemy");
+        Debug.Log("Enemy로 설정돼있는 거 나중에 TeamSystem을 사용하는 거로 수정 예정.");
     }
 
     public void OnPointerEnter(PointerEventData eventData)

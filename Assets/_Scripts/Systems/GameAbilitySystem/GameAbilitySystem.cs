@@ -67,9 +67,25 @@ public class ReactionKey : IEquatable<ReactionKey>
 
 public class GameAbilitySystem : Singleton<GameAbilitySystem>
 {
+    private List<GameAbility> _reactions = new();
+    
     private static Dictionary<ReactionKey, List<GameAbility>> _preReactions = new();
     private static Dictionary<ReactionKey, List<GameAbility>> _postReactions = new();
     
     // 해당 Type(GameAbility)에 대한 Performer(IEnumerator)를 반환합니다.
     private static Dictionary<Type, Func<GameAbility, IEnumerator>> _performers = new();
+
+    public void AddPerformer<T>(Func<T, IEnumerator> performer) where T : GameAbility
+    {
+        Type type = typeof(T);
+        IEnumerator wrappedPerformer(GameAbility ga) => performer((T)ga);
+        
+        _performers[type] = wrappedPerformer;
+    }
+
+    public void RemovePerformer<T>() where T : GameAbility
+    {
+        Type type = typeof(T);
+        _performers.Remove(type);
+    }
 }

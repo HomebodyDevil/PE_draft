@@ -16,3 +16,8 @@ MonoBehaviour:
   <CardDescription>k__BackingField: Random Attack
   <CardCost>k__BackingField: 1
   <CardPlayType>k__BackingField: 0
+  <TargetAbility>k__BackingField: []
+  <NonTargetAbility>k__BackingField: []
+  references:
+    version: 2
+    RefIds: []
