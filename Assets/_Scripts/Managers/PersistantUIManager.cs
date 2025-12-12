@@ -11,7 +11,7 @@ public enum ShowCards
     BattleGraveyard,
 }
 
-public class PersistantUIManager : PersistantSingleton<PersistantUIManager>
+public class PersistantUIManager : Singleton<PersistantUIManager>
 {
     public Action<bool, ShowCards> OnShowCardsExhibition;
     

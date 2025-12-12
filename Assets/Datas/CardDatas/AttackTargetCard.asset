@@ -16,3 +16,12 @@ MonoBehaviour:
   <CardDescription>k__BackingField: Simple Attack
   <CardCost>k__BackingField: 2
   <CardPlayType>k__BackingField: 1
+  <TargetAbility>k__BackingField:
+  - rid: 9223071043874455648
+  <NonTargetAbility>k__BackingField: []
+  references:
+    version: 2
+    RefIds:
+    - rid: 9223071043874455648
+      type: {class: DealDamageGA, ns: , asm: Assembly-CSharp}
+      data: 

@@ -105,6 +105,8 @@ public class CardView :
                 OnTargetablePointerUp(eventData);
                 break;
         }
+        
+        transform.SetSiblingIndex(_originalIndex);
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -141,7 +143,7 @@ public class CardView :
         // transform.DORotate(_originalRotation.eulerAngles, ConstValue.CARD_POS_RESTORE_SECONDS);
 
         CardViewSystem.Instance?.OnLineupCardViews?.Invoke();
-        transform.SetSiblingIndex(_originalIndex);
+        //transform.SetSiblingIndex(_originalIndex);
     }
 
     private void OnTargetablePointerUp(PointerEventData eventData)
@@ -156,9 +158,9 @@ public class CardView :
         else
         {    
             Debug.Log("No target");
-            transform.SetSiblingIndex(_originalIndex);
         }
         
+        //transform.SetSiblingIndex(_originalIndex);
         LineSystem.Instance?.SetVisible(false);
         CardViewSystem.Instance?.OnLineupCardViews?.Invoke(); 
     }

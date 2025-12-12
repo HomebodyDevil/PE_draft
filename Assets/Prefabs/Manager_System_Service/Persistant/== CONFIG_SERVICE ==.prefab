@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7601060023459630007}
   - component: {fileID: 790678763183147048}
   m_Layer: 0
-  m_Name: __ CONFIG_SERVICE __
+  m_Name: == CONFIG_SERVICE ==
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
