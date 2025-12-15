@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Character : MonoBehaviour
 {
@@ -7,8 +9,8 @@ public class Character : MonoBehaviour
     public float MaxHealth { get; private set; }
 
     // Character들은 본인이 등록한 Reaction에 관한 리스트를 hold한다.
-    public Dictionary<ReactionTiming, List<GameAbility>> AddedReactions { get; private set; } = new();
-    
+    public Dictionary<PEEnum.ReactionTiming, List<GameAbility>> AddedReactions { get; private set; } = new();
+
     public virtual void Damage(float damageAmount)
     {
         CurrentHealth -= damageAmount;
@@ -26,7 +28,7 @@ public class Character : MonoBehaviour
         CurrentHealth = Mathf.Max(0f, CurrentHealth);
     }
 
-    public void AddAddedReaction(GameAbility reaction, ReactionTiming timing)
+    public void AddAddedReaction(GameAbility reaction, PEEnum.ReactionTiming timing)
     {
         if (AddedReactions.ContainsKey(timing))
         {

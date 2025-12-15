@@ -17,10 +17,9 @@ public class InBattleCard
     public Card OriginalCard { get; private set; }
 
     public InBattleCard(
-        Card battleCard,
         Card originalCard)
     {
-        BattleCard = battleCard;
+        BattleCard = new(originalCard);
         OriginalCard = originalCard;
     }
 }
@@ -59,5 +58,6 @@ public class Card
         this.Cost = other.Cost;
         this.Name = other.Name;
         this.Description = other.Description;
+        this._cardData = other._cardData;
     }
 }

@@ -1,8 +1,10 @@
 using System;
+using System.Collections.Generic;
 using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 
 public class CardView : 
     MonoBehaviour, 
@@ -15,11 +17,11 @@ public class CardView :
     IPointerExitHandler
 {
     public static bool CanInteract = true;
-    public InBattleCard _card { get; private set; }
+    public InBattleCard InBattleCard { get; private set; }
 
     [SerializeField] public TextMeshProUGUI cardNameTMP;
     [SerializeField] public TextMeshProUGUI cardDescriptionTMP;
-
+    
     [SerializeField] private Transform _visuals;
     //[SerializeField] private TextMeshProUGUI costTMP;
 
@@ -39,7 +41,7 @@ public class CardView :
     
     public void SetCardView(InBattleCard card)
     {
-        _card = card;
+        InBattleCard = card;
         
         SetCardViewNameText(card.BattleCard.Name);
         SetCardViewDescriptionText(card.BattleCard.Description);
@@ -79,14 +81,14 @@ public class CardView :
         _originalIndex = transform.GetSiblingIndex();
         transform.SetAsLastSibling();
         
-        if (HoveringCardViewSystem.Instance?._currentHoveringCard == _card.BattleCard)
+        if (HoveringCardViewSystem.Instance?._currentHoveringCard == InBattleCard.BattleCard)
         {
             HoveringCardViewSystem.Instance?.OnSetHoveringCardViewVisible?.Invoke(false);
         }
         
         SetVisible(true);
         
-        switch (_card.BattleCard.CardPlayType)
+        switch (InBattleCard.BattleCard.CardPlayType)
         {
             case ECardPlayType.Playable:
                 OnPlayablePointerDown(eventData);
@@ -101,7 +103,7 @@ public class CardView :
     {
         if (!CanInteract) return;
         
-        switch (_card.BattleCard.CardPlayType)
+        switch (InBattleCard.BattleCard.CardPlayType)
         {
             case ECardPlayType.Playable:
                 OnPlayablePointerUp(eventData);
@@ -118,7 +120,7 @@ public class CardView :
     {
         if (!CanInteract) return;
         
-        switch (_card.BattleCard.CardPlayType)
+        switch (InBattleCard.BattleCard.CardPlayType)
         {
             case ECardPlayType.Playable:
                 OnPlayablePointerDrag(eventData);
@@ -157,10 +159,28 @@ public class CardView :
     {
         // BattleSystem의 Target이 있다면, 해당 Target들에 대한 카드 Effect를 수행한다.
         // 이후, BattleSystem의 Target을 초기화 한다.
-
-        if (BattleSystem.Instance.CurrentTargets.Count > 0)
+        BattleSystem.Instance?.OnFindTarget?.Invoke("Enemy");
+        
+        if (BattleSystem.Instance?.CurrentTargets.Count > 0)
         {
-            Debug.Log($"Target Valid");
+            foreach (var ga in InBattleCard.BattleCard.TargetAbility)
+            {
+                if (ga is TargetGameAbility targetGa)
+                {
+                    targetGa.SetTargets(BattleSystem.Instance.CurrentTargets);
+                }
+            }
+
+            BattleSystem.Instance?.OnClearTargets?.Invoke();
+
+            List<GameAbility> gaForRequest = new();
+            gaForRequest.AddRange(InBattleCard.BattleCard.TargetAbility);
+            gaForRequest.AddRange(InBattleCard.BattleCard.NonTargetAbility);
+
+            Debug.Log("caster를 null로 했는데, 나중에 고치자");
+            GameAbilitySystem.Instance?.RequestPerformGameAbility(
+                null,
+                gaForRequest);
         }
         else
         {    
@@ -193,7 +213,7 @@ public class CardView :
         
         HoveringCardViewSystem.Instance?.OnSetHoveringCardViewVisible?.Invoke(true);
         HoveringCardViewSystem.Instance?.OnSetHoveringCardViewPos?.Invoke(transform.position);
-        HoveringCardViewSystem.Instance?.OnSetCurrentHoveringCard?.Invoke(_card.BattleCard);
+        HoveringCardViewSystem.Instance?.OnSetCurrentHoveringCard?.Invoke(InBattleCard.BattleCard);
         
         SetVisible(false);
     }
@@ -203,7 +223,7 @@ public class CardView :
         if (!CanInteract) return;
         if (HoveringCardViewSystem.Instance != null && HoveringCardViewSystem.Instance._dragging) return;
         
-        if (HoveringCardViewSystem.Instance?._currentHoveringCard == _card.BattleCard)
+        if (HoveringCardViewSystem.Instance?._currentHoveringCard == InBattleCard.BattleCard)
         {
             HoveringCardViewSystem.Instance?.OnSetHoveringCardViewVisible?.Invoke(false);
         }

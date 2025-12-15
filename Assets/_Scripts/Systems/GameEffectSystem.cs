@@ -16,6 +16,8 @@ public class GameEffectSystem : Singleton<GameEffectSystem>
 
     public IEnumerator DealDamagePerformer(DealDamageGA dealDamageGA)
     {
+        Debug.Log("Dealing Damage");
+        
         yield break;
     }
 }

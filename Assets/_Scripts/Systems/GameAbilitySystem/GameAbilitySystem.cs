@@ -3,25 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ReactionTiming
-{
-    Pre,
-    Post,
-}
-
-// Reaction을 시전할 때, 시전자가 Reaction을 수행할 대상.
-// i.e. 임의의 Enemy가 Reaction을 등록한 상황.
-// All : Enemy든 Player든 어떤 Action 모두가 Reaction Trigger의 대상.
-// Friendly : Enemy 기준, Enemy의 Friendly(Enemy)의 Actino이 대상. 
-// Hostile : Enemy 기준, Enemy의 Hostile(Player)의 Action이 대상.
-public enum ReactionTarget
-{
-    All,
-    Caster,
-    Friendly,
-    Hostile,
-}
-
 // public class ReactionKey : IEquatable<ReactionKey>
 // {
 //     // Type: 해당 Type(GameAbility)에 대한 Reaction
@@ -70,13 +51,13 @@ public class ReactionContext
 {
     public Character ReactionPerformer { get; private set; } 
     public GameAbility ReactionGA { get; private set; }
-    public ReactionTarget ReactionTarget { get; private set; }
+    public PEEnum.ReactionTarget ReactionTarget { get; private set; }
     public int ReactionCount { get; private set; }
 
     public ReactionContext(
         Character reactionPerformer,
         GameAbility reactionGA,
-        ReactionTarget reactionTarget,
+        PEEnum.ReactionTarget reactionTarget,
         int reactionCount)
     {
         ReactionPerformer = reactionPerformer;
@@ -103,15 +84,27 @@ public class ReactionContext
     }
 }
 
+class PerformGameAbilityContext
+{
+    public Character Caster { get; private set; }
+    public GameAbility GameAbility { get; private set; }
+    public List<Character> Targets { get; private set; }
+
+    public PerformGameAbilityContext(
+        Character caster, 
+        GameAbility gameAbility)
+    {
+        Caster = caster;
+        GameAbility = gameAbility;
+    }
+}
+
 public class GameAbilitySystem : Singleton<GameAbilitySystem>
 {
-    public Action<Character> OnPerformGameAbility;
-    
-    private List<GameAbility> _reactions = new();
-    
     // private static Dictionary<ReactionKey, List<GameAbility>> _preReactions = new();
     // private static Dictionary<ReactionKey, List<GameAbility>> _postReactions = new();
 
+    // 해당 Type(GameAbility)에 대한 Reaction들에 대한 List.
     private static Dictionary<Type, List<ReactionContext>> _preReactions = new();
     private static Dictionary<Type, List<ReactionContext>> _postReactions = new();
     
@@ -119,48 +112,86 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
     private static Dictionary<Type, Func<GameAbility, IEnumerator>> _performers = new();
     
     // 한 카드가 여러 효과를 지니고 있을 경우, 이 List에 넣어두었다가 순차적으로 수행토록 한다.
-    private List<GameAbility> _piledGameAbility = new();
+    // GA의 ReactionGA가 발동해야 한다면, 이 리스트에 추가하여 차후 수행되도록 한다.
+    // 확실하진 않지만, Post Reaction들이 여기에 쌓일 것 같다.
+    private Queue<PerformGameAbilityContext> _piledGameAbility = new();
     
     public bool IsPerforming { get; private set; } = false;
     //private int _reactionCounter = ConstValue.REACTION_MAX_CHAIN;
 
     private Coroutine _performAbilityFlowCoroutine;
 
-    private void OnEnable()
-    {
-        OnPerformGameAbility += PerformGameAbility;
-    }
-
     private void OnDisable()
     {
-        OnPerformGameAbility -= PerformGameAbility;
-        
         if (_performAbilityFlowCoroutine != null) StopCoroutine(_performAbilityFlowCoroutine);
     }
 
     /// <summary></summary>
     /// <param name="caster">GameAbility 시전자</param>
-    private void PerformGameAbility(Character caster)
+    // 아마 CardView에서 이 함수를 호출할 확률이 클 것인데..
+    // return 값을 토대로 Perform이 수행되는지 아닌지에 대한 여부를 알 수 있도록 함.
+    public bool RequestPerformGameAbility(
+        Character caster, 
+        List<GameAbility> gameAbilities)
     {
-        if (IsPerforming) return;
+        if (IsPerforming) return false;
+
+        foreach (var gameAbility in gameAbilities)
+        {
+            PerformGameAbilityContext gaCtx = new(caster, gameAbility);
+            _piledGameAbility.Enqueue(gaCtx);
+        }
+        
         _performAbilityFlowCoroutine = StartCoroutine(PerformGameAbilitySequence());
+
+        return true;
     }
 
     private IEnumerator PerformGameAbilitySequence()
     {
         IsPerforming = true;
 
-        foreach (var gameAbility in _piledGameAbility)
+        int performCount = 0;
+        
+        while (_piledGameAbility.Count > 0 && performCount < ConstValue.MAX_PERFORM_CHAIN_COUNT)
         {
-            yield return GameAbilityFlowCoroutine(gameAbility);
+            var ctx = _piledGameAbility.Dequeue();
+            yield return GameAbilityFlowCoroutine(ctx);
+
+            performCount++;
         }
+        
+        // foreach (var gameAbility in _piledGameAbility)
+        // {
+        //     yield return GameAbilityFlowCoroutine(gameAbility);
+        // }
 
         _piledGameAbility.Clear();
         IsPerforming = false;
     }
     
-    private IEnumerator GameAbilityFlowCoroutine(GameAbility gameAbility)
+    private IEnumerator GameAbilityFlowCoroutine(PerformGameAbilityContext gaCtx)
     {
+        yield return PerformPreReaction(gaCtx);
+        yield return PerformGameAbility(gaCtx);
+        yield return PerformPostReaction(gaCtx);
+    }
+
+    private IEnumerator PerformGameAbility(PerformGameAbilityContext gaCtx)
+    {
+        Debug.Log("Performing Game Ability");
+        yield break;
+    }
+
+    private IEnumerator PerformPreReaction(PerformGameAbilityContext ctx)
+    {
+        Debug.Log("Performing Pre Reaction");
+        yield break;
+    }
+    
+    private IEnumerator PerformPostReaction(PerformGameAbilityContext ctx)
+    {
+        Debug.Log("Performing Post Reaction");
         yield break;
     }
 
@@ -176,11 +207,11 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
     public void AddReaction<T>(
         Character responder, 
         GameAbility reactionGA, 
-        ReactionTarget reactionTarget, 
+        PEEnum.ReactionTarget reactionTarget, 
         int reactionCount, 
-        ReactionTiming timing) where T : GameAbility
+        PEEnum.ReactionTiming timing) where T : GameAbility
     {
-        var list = timing == ReactionTiming.Pre ? _preReactions : _postReactions;
+        var list = timing == PEEnum.ReactionTiming.Pre ? _preReactions : _postReactions;
 
         Type triggerType = typeof(T);
         ReactionContext reactionCtx = new(responder, reactionGA, reactionTarget, reactionCount);
@@ -203,7 +234,7 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
     // 타입은 정확히 일치해야 함.
     public void RemoveReaction<TTrigger, TReaction>(
         Character responder, 
-        ReactionTiming timing) 
+        PEEnum.ReactionTiming timing) 
         where TTrigger : GameAbility 
         where TReaction : GameAbility
     {
@@ -216,7 +247,7 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
             }
         }
         
-        var systemReactionDict = timing == ReactionTiming.Pre ? _preReactions : _postReactions;
+        var systemReactionDict = timing == PEEnum.ReactionTiming.Pre ? _preReactions : _postReactions;
         Type reactionType = typeof(TReaction);
         
         if (!systemReactionDict.TryGetValue(typeof(TTrigger), out var systemReactionList))

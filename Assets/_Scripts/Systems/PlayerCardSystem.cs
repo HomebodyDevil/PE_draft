@@ -23,8 +23,7 @@ public class PlayerCardSystem : Singleton<PlayerCardSystem>
     {
         foreach (var card in PlayerStatusService.Instance.PlayerStatus.PlayerDeck)
         {
-            Card cardCopy = new(card);    // 같은 값의 다른 객체.
-            InBattleCard battleCard = new(cardCopy, card);
+            InBattleCard battleCard = new(card);
             
             Deck.Add(battleCard);
         }

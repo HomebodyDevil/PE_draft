@@ -110,13 +110,13 @@ public class CardViewSystem : Singleton<CardViewSystem>
     {
         foreach (CardView cardView in _usingCardViewList)
         {
-            if (cardView._card == null)
+            if (cardView.InBattleCard == null)
             {
                 Debug.Log("cardView is null");
                 break;
             }
             
-            if (cardView._card.Equals(inBattleCard))
+            if (cardView.InBattleCard.Equals(inBattleCard))
             {
                 RectTransform cardViewRT = null;
                 if (cardView.TryGetComponent<RectTransform>(out cardViewRT))
