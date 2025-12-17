@@ -14,9 +14,16 @@ public class PlayerCardSystem : Singleton<PlayerCardSystem>
     public List<InBattleCard> Graveyard { get; private set; } = new();
     public List<InBattleCard> ExclusionArea { get; private set; } = new();  // 해당 게임에서 제외된 카드.
 
+    public float UseCardDistance { get; private set; }
+
+    private Coroutine _drawCardsCoroutine;
+
+    private int _pendingDrawCount = 0;
+    
     private void Start()
     {
         SetupDeck();
+        SetUseCardDistance();
     }
 
     private void OnEnable()
@@ -41,13 +48,24 @@ public class PlayerCardSystem : Singleton<PlayerCardSystem>
         Deck.Shuffle();
     }
 
+    public void SetUseCardDistance()
+    {
+        float screenHeight = Screen.height;
+        UseCardDistance = screenHeight * ConstValue.USE_CARD_DISTANCE_RATIO;
+    }
+
     /// <summary>
     /// 카드를 Deck에서 뽑을 때 사용하는 함수.
     /// </summary>
     /// <param name="count">뽑을 카드의 개수</param>
     public void DrawCards(int count)
     {
-        StartCoroutine(DrawCardsCoroutine(count));
+        _pendingDrawCount += count;
+        
+        if (_drawCardsCoroutine == null)
+        {
+            _drawCardsCoroutine = StartCoroutine(DrawCardsCoroutine());
+        }
     }
 
     /// <summary>
@@ -65,36 +83,22 @@ public class PlayerCardSystem : Singleton<PlayerCardSystem>
         StartCoroutine(MoveCardToGraveyardCoroutine(card));
     }
 
-    public IEnumerator DrawCardsCoroutine(int count)
+    public IEnumerator DrawCardsCoroutine()
     {
-        if (Deck.Count == 0 && Graveyard.Count == 0 && count > 0)
-        {
-            Debug.Log($"Cant Draw Cards. deck: {Deck.Count}, graveyard: {Graveyard.Count}");
-            yield break;
-        }
-        
-        int possibleCount = Mathf.Min(count, Deck.Count);
-        int remainingCount = count - possibleCount;
-
         int loopCnt = 0;
-        do
+        while (_pendingDrawCount > 0 && loopCnt < ConstValue.MAX_LOOP)
         {
-            if (loopCnt++ > ConstValue.MAX_LOOP)
+            if (Deck.Count < _pendingDrawCount)
             {
-                Debug.Log("Too much Loop");
-                break;
-            }
-            
-            for (int i = 0; i < possibleCount; i++)
-            {
-                yield return DrawCardCoroutine();
+                RefillDeck();
             }
 
-            if (remainingCount > 0) RefillDeck();
+            yield return DrawCardCoroutine();
             
-            possibleCount = Mathf.Min(remainingCount, Deck.Count);
-            remainingCount = count - possibleCount;
-        } while (possibleCount > 0);
+            _pendingDrawCount--;
+        }
+
+        _drawCardsCoroutine = null;
     }
 
     private IEnumerator DrawCardCoroutine()

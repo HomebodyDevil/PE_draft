@@ -7,11 +7,7 @@ public class TargetGameAbility : GameAbility
 
     public virtual void SetTargets(List<Character> targets)
     {
-        Targets = targets;
-    }
-    
-    public override void ExecuteGameAbility(Character executor)
-    {
-        
+        Targets.Clear();
+        Targets.AddRange(targets);
     }
 }

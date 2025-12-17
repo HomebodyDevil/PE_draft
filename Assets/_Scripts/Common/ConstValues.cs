@@ -16,6 +16,7 @@ public static class ConstValue
     public const float CARD_POS_RESTORE_SECONDS = 0.05f;
     public const float CARDVIEW_SPLINE_MIN = 0.001f;
     public const float CARDVIEW_ROTATE_MAX = 10f;
+    public const float USE_CARD_DISTANCE_RATIO = 0.23f;
 
     public const float DEFAULT_PLAYER_HEALTH = 10f;
     public const float DEFAULT_PLAYER_COST = 5f;

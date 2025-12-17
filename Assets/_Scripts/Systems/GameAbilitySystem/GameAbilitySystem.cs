@@ -141,6 +141,7 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
     // GA의 ReactionGA가 발동해야 한다면, 이 리스트에 추가하여 차후 수행되도록 한다.
     // 확실하진 않지만, Post Reaction들이 여기에 쌓일 것 같다.
     private Queue<PerformGameAbilityContext> _piledGameAbility = new();
+    private Queue<PerformGameAbilityContext> _gameAbilityBuffer = new();
     
     public bool IsPerforming { get; private set; } = false;
     //private int _reactionCounter = ConstValue.REACTION_MAX_CHAIN;
@@ -160,7 +161,16 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
         Character caster, 
         List<GameAbility> gameAbilities)
     {
-        if (IsPerforming) return false;
+        if (IsPerforming)
+        {
+            foreach (var gameAbility in gameAbilities)
+            {
+                PerformGameAbilityContext gaCtx = new(caster, gameAbility);
+                _gameAbilityBuffer.Enqueue(gaCtx);
+            }
+            
+            return false;
+        }
 
         foreach (var gameAbility in gameAbilities)
         {
@@ -178,10 +188,18 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
         IsPerforming = true;
 
         int performCount = 0;
-        
         while (_piledGameAbility.Count > 0 && performCount < ConstValue.MAX_PERFORM_CHAIN_COUNT)
         {
             var ctx = _piledGameAbility.Dequeue();
+            yield return GameAbilityFlowCoroutine(ctx);
+
+            performCount++;
+        }
+        
+        performCount = 0;
+        while (_gameAbilityBuffer.Count > 0 && performCount < ConstValue.MAX_PERFORM_CHAIN_COUNT)
+        {
+            var ctx = _gameAbilityBuffer.Dequeue();
             yield return GameAbilityFlowCoroutine(ctx);
 
             performCount++;
@@ -193,6 +211,8 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
         // }
 
         _piledGameAbility.Clear();
+        _gameAbilityBuffer.Clear();
+        
         IsPerforming = false;
     }
     
@@ -205,7 +225,7 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
 
     private IEnumerator PerformGameAbility(PerformGameAbilityContext gaCtx)
     {
-        Debug.Log("Performing Game Ability");
+        //Debug.Log("Performing Game Ability");
 
         if (_performers.TryGetValue(gaCtx.GameAbility.GetType(), out Func<GameAbility, IEnumerator> performer))
         {

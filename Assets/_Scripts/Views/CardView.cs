@@ -4,6 +4,7 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
 
 public class CardView : 
@@ -16,7 +17,7 @@ public class CardView :
     IPointerEnterHandler, 
     IPointerExitHandler
 {
-    public static bool CanInteract = true;
+    private bool CanInteract = true;
     public InBattleCard InBattleCard { get; private set; }
 
     [SerializeField] public TextMeshProUGUI cardNameTMP;
@@ -26,6 +27,8 @@ public class CardView :
     //[SerializeField] private TextMeshProUGUI costTMP;
 
     private int _originalIndex = 0;
+    private Vector2 _startPosition = Vector2.zero;
+    private Vector2 _endPosition = Vector2.zero;
     
     private void Awake()
     {
@@ -47,6 +50,7 @@ public class CardView :
     public void SetVisible(bool visible)
     {
         _visuals.gameObject.SetActive(visible);
+        CanInteract = true;
     }
     
     public void SetCardView(InBattleCard card)
@@ -95,8 +99,12 @@ public class CardView :
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!CanInteract) return;
+        if (!CanInteract)
+        {
+            return;
+        }
         
+        _startPosition = Mouse.current.position.ReadValue();
         _originalIndex = transform.GetSiblingIndex();
         transform.SetAsLastSibling();
         
@@ -122,6 +130,8 @@ public class CardView :
     {
         if (!CanInteract) return;
         
+        _endPosition = Mouse.current.position.ReadValue();
+        
         switch (InBattleCard.BattleCard.CardPlayType)
         {
             case ECardPlayType.Playable:
@@ -133,6 +143,8 @@ public class CardView :
         }
         
         transform.SetSiblingIndex(_originalIndex);
+        _startPosition = _endPosition = Vector2.zero;
+        HoveringCardViewSystem.Instance._dragging = false;
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -169,9 +181,15 @@ public class CardView :
         // 본래 위치로 이동시킨다.
         // transform.DOMove(_originalPosition, ConstValue.CARD_POS_RESTORE_SECONDS);
         // transform.DORotate(_originalRotation.eulerAngles, ConstValue.CARD_POS_RESTORE_SECONDS);
-
+        float dragDist = Vector2.Distance(_startPosition, eventData.position);
+        float minDist = PlayerCardSystem.Instance.UseCardDistance;
+        if (dragDist > minDist)
+        {
+            RequestPerformGameAbility();
+        }
+        
         CardViewSystem.Instance?.OnLineupCardViews?.Invoke();
-        //transform.SetSiblingIndex(_originalIndex);
+        transform.SetSiblingIndex(_originalIndex);
     }
 
     private void OnTargetablePointerUp(PointerEventData eventData)
@@ -182,36 +200,50 @@ public class CardView :
         
         if (BattleSystem.Instance?.CurrentTargets.Count > 0)
         {
-            foreach (var ga in InBattleCard.BattleCard.TargetAbility)
-            {
-                if (ga is TargetGameAbility targetGa)
-                {
-                    targetGa.SetTargets(BattleSystem.Instance.CurrentTargets);
-                }
-            }
-
-            BattleSystem.Instance?.OnClearTargets?.Invoke();
-
-            List<GameAbility> gaForRequest = new();
-            gaForRequest.AddRange(InBattleCard.BattleCard.TargetAbility);
-            gaForRequest.AddRange(InBattleCard.BattleCard.NonTargetAbility);
-
-            Debug.Log("caster를 null로 했는데, 나중에 고치자");
-            if (GameAbilitySystem.Instance != null &&
-                GameAbilitySystem.Instance.RequestPerformGameAbility(null, gaForRequest))
-            {
-                PlayerCardSystem.Instance?.OnCardMoveToGraveyard?.Invoke(InBattleCard);
-                //Debug.Log($"Hand Cnt: {PlayerCardSystem.Instance.Hand.Count}");
-            }
+            RequestPerformGameAbility();
         }
         else
         {    
+            transform.SetSiblingIndex(_originalIndex);
             Debug.Log("No target");
         }
         
-        //transform.SetSiblingIndex(_originalIndex);
-        LineSystem.Instance?.SetVisible(false);
         CardViewSystem.Instance?.OnLineupCardViews?.Invoke(); 
+        LineSystem.Instance?.SetVisible(false);
+        
+        // if (BattleSystem.Instance?.CurrentTargets.Count > 0)
+        // {
+        //     foreach (var ga in InBattleCard.BattleCard.TargetAbility)
+        //     {
+        //         if (ga is TargetGameAbility targetGa)
+        //         {
+        //             ga.SetExecutor(PEEnum.GAExecutor.Player);
+        //             targetGa.SetTargets(BattleSystem.Instance.CurrentTargets);
+        //         }
+        //     }
+        //
+        //     BattleSystem.Instance?.OnClearTargets?.Invoke();
+        //
+        //     List<GameAbility> gaForRequest = new();
+        //     gaForRequest.AddRange(InBattleCard.BattleCard.TargetAbility);
+        //     gaForRequest.AddRange(InBattleCard.BattleCard.NonTargetAbility);
+        //
+        //     Debug.Log("caster를 null로 했는데, 나중에 고치자");
+        //     if (GameAbilitySystem.Instance != null &&
+        //         GameAbilitySystem.Instance.RequestPerformGameAbility(null, gaForRequest))
+        //     {
+        //         PlayerCardSystem.Instance?.OnCardMoveToGraveyard?.Invoke(InBattleCard);
+        //         //Debug.Log($"Hand Cnt: {PlayerCardSystem.Instance.Hand.Count}");
+        //     }
+        // }
+        // else
+        // {    
+        //     Debug.Log("No target");
+        // }
+
+        // transform.SetSiblingIndex(_originalIndex);
+        // LineSystem.Instance?.SetVisible(false);
+        // CardViewSystem.Instance?.OnLineupCardViews?.Invoke(); 
     }
     
     private void OnPlayablePointerDrag(PointerEventData eventData)
@@ -228,10 +260,18 @@ public class CardView :
         Debug.Log("Enemy로 설정돼있는 거 나중에 TeamSystem을 사용하는 거로 수정 예정.");
     }
 
+    private void RequestPerformGameAbility()
+    {
+        PlayPlayerardGA playPlayerCardGA = new(InBattleCard);
+        GameAbilitySystem.Instance.RequestPerformGameAbility(null, new() { playPlayerCardGA });
+        
+        CanInteract = false;
+    }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!CanInteract) return;
-        if (HoveringCardViewSystem.Instance != null && HoveringCardViewSystem.Instance._dragging) return;
+        if (HoveringCardViewSystem.Instance == null || HoveringCardViewSystem.Instance._dragging) return;
         
         HoveringCardViewSystem.Instance?.OnSetHoveringCardViewVisible?.Invoke(true);
         HoveringCardViewSystem.Instance?.OnSetHoveringCardViewPos?.Invoke(transform.position);
@@ -243,9 +283,10 @@ public class CardView :
     public void OnPointerExit(PointerEventData eventData)
     {
         if (!CanInteract) return;
-        if (HoveringCardViewSystem.Instance != null && HoveringCardViewSystem.Instance._dragging) return;
+        if (HoveringCardViewSystem.Instance == null || HoveringCardViewSystem.Instance._dragging) return;
         
-        if (HoveringCardViewSystem.Instance?._currentHoveringCard == InBattleCard.BattleCard)
+        if (HoveringCardViewSystem.Instance?._currentHoveringCard is { } hoveringCard &&
+            hoveringCard == InBattleCard.BattleCard)
         {
             HoveringCardViewSystem.Instance?.OnSetHoveringCardViewVisible?.Invoke(false);
         }
@@ -263,15 +304,5 @@ public class CardView :
     {
         if (!CanInteract) return;
         if (HoveringCardViewSystem.Instance != null) HoveringCardViewSystem.Instance._dragging = false;
-    }
-
-    private void OnShowCards()
-    {
-        CanInteract = false;
-    }
-    
-    private void OnHideCards()
-    {
-        CanInteract = true;
     }
 }

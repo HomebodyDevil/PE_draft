@@ -99,6 +99,7 @@ public class CardViewSystem : Singleton<CardViewSystem>
         CardView cardView = GetAvailableCardView(true);
         cardView?.SetCardView(inBattleCard);
         cardView?.transform.SetParent(cardViews);
+        cardView?.SetVisible(true);
 
         LineUpHandCardViews();
     }
@@ -122,7 +123,6 @@ public class CardViewSystem : Singleton<CardViewSystem>
                 if (cardView.TryGetComponent<RectTransform>(out cardViewRT))
                 {
                     _usingCardViewList.Remove(cardView);
-                    _extraCardViewList.Add(cardView);
                     
                     cardViewRT.DOScale(Vector3.zero, ConstValue.CARD_DRAW_SECONDS);
                     cardViewRT.DOMove(graveyardButtonRT.position, ConstValue.CARD_DRAW_SECONDS);
@@ -176,6 +176,7 @@ public class CardViewSystem : Singleton<CardViewSystem>
         }
         
         cardViewGO.SetActive(active);
+        if (active == false) _extraCardViewList.Add(cardViewGO.GetComponent<CardView>());
     }
 
     private IEnumerator LineUpHandCardViewsCoroutine()

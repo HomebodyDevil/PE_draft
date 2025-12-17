@@ -5,5 +5,10 @@ using UnityEngine;
 [Serializable]
 public abstract class GameAbility
 {
-    public abstract void ExecuteGameAbility(Character executor);
+    public PEEnum.GAExecutor Executor { get; private set; }
+
+    public virtual void SetExecutor(PEEnum.GAExecutor executorType)
+    {
+        this.Executor = executorType;
+    }
 }
