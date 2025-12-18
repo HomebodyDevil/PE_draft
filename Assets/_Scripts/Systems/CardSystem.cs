@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class CardSystem : Singleton<CardSystem>
 {
+    public InBattleCard LastUsedCard;
+    
     private void OnEnable()
     {
         GameAbilitySystem.Instance.AddPerformer<PlayPlayerardGA>(PlayPlayerCardPerformer);
@@ -21,8 +23,9 @@ public class CardSystem : Singleton<CardSystem>
 
     private IEnumerator PlayPlayerCardPerformer(PlayPlayerardGA playCardGa)
     {
-        //Debug.Log("Play Card Performer");
+        Debug.Log("Play Card Performer");
 
+        LastUsedCard = playCardGa.InBattleCardToPlay;
         InBattleCard inBattleCard = playCardGa.InBattleCardToPlay;
         
         foreach (var ga in inBattleCard.BattleCard.TargetAbility)
@@ -41,11 +44,13 @@ public class CardSystem : Singleton<CardSystem>
         gaForRequest.AddRange(inBattleCard.BattleCard.NonTargetAbility);
 
         Debug.Log("caster를 null로 했는데, 나중에 고치자");
-        GameAbilitySystem.Instance?.RequestPerformGameAbility(null, gaForRequest);
+        GameAbilitySystem.Instance?.RequestPerformGameAbility(
+            null,
+            gaForRequest);
         //Debug.Log($"Hand Cnt: {PlayerCardSystem.Instance.Hand.Count}");
 
         PlayerCardSystem.Instance?.OnCardMoveToGraveyard?.Invoke(inBattleCard);
-        
+
         yield break;
     }
 

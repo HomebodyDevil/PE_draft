@@ -157,9 +157,10 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
     /// <param name="caster">GameAbility 시전자</param>
     // 아마 CardView에서 이 함수를 호출할 확률이 클 것인데..
     // return 값을 토대로 Perform이 수행되는지 아닌지에 대한 여부를 알 수 있도록 함.
-    public bool RequestPerformGameAbility(
+    // success 변수는 안 쓸 것 같음.
+    public void RequestPerformGameAbility(
         Character caster, 
-        List<GameAbility> gameAbilities)
+        List<GameAbility> gameAbilities)    //, ref bool success
     {
         if (IsPerforming)
         {
@@ -169,18 +170,18 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
                 _gameAbilityBuffer.Enqueue(gaCtx);
             }
             
-            return false;
-        }
-
-        foreach (var gameAbility in gameAbilities)
+            //success = false;
+        }   //else success = true;
+        else
         {
-            PerformGameAbilityContext gaCtx = new(caster, gameAbility);
-            _piledGameAbility.Enqueue(gaCtx);
-        }
+            foreach (var gameAbility in gameAbilities)
+            {
+                PerformGameAbilityContext gaCtx = new(caster, gameAbility);
+                _piledGameAbility.Enqueue(gaCtx);
+            }
         
-        _performAbilityFlowCoroutine = StartCoroutine(PerformGameAbilitySequence());
-
-        return true;
+            _performAbilityFlowCoroutine = StartCoroutine(PerformGameAbilitySequence());   
+        }
     }
 
     private IEnumerator PerformGameAbilitySequence()

@@ -132,6 +132,8 @@ public class PlayerCardSystem : Singleton<PlayerCardSystem>
         
         Graveyard.Add(card);
         
+        Debug.Log("Graveyard cnt: " + Graveyard.Count);
+        
         yield break;
     }
 
@@ -139,8 +141,13 @@ public class PlayerCardSystem : Singleton<PlayerCardSystem>
     {
         Deck.AddRange(Graveyard);
         Deck.Shuffle();
-        
         Graveyard.Clear();
+        
+        if (Deck.Contains(CardSystem.Instance.LastUsedCard))
+        {
+            Deck.Remove(CardSystem.Instance.LastUsedCard);
+            Graveyard.Add(CardSystem.Instance.LastUsedCard);
+        }
 
         yield break;
     }

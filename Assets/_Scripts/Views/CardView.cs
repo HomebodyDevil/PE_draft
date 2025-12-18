@@ -181,7 +181,7 @@ public class CardView :
         // 본래 위치로 이동시킨다.
         // transform.DOMove(_originalPosition, ConstValue.CARD_POS_RESTORE_SECONDS);
         // transform.DORotate(_originalRotation.eulerAngles, ConstValue.CARD_POS_RESTORE_SECONDS);
-        float dragDist = Vector2.Distance(_startPosition, eventData.position);
+        float dragDist = eventData.position.y - _startPosition.y;
         float minDist = PlayerCardSystem.Instance.UseCardDistance;
         if (dragDist > minDist)
         {

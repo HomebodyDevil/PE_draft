@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -7,6 +8,7 @@ public class SceneService : PersistantSingleton<SceneService>
     [SerializeField] private float _minWaitTime = 1.5f;
     
     private Coroutine _sceneLoadCoroutine;
+    private List<string> _loadingScenes = new();
     
     public void ChangeScene(string scene)
     {
@@ -15,6 +17,10 @@ public class SceneService : PersistantSingleton<SceneService>
 
     private IEnumerator LoadSceneCoroutine(string sceneName)
     {
+        if (_loadingScenes.Contains(sceneName))
+            yield break;
+        
+        _loadingScenes.Add(sceneName);
         float time = 0f;
         
         var loadSceneOP = SceneManager.LoadSceneAsync(sceneName);
@@ -32,5 +38,7 @@ public class SceneService : PersistantSingleton<SceneService>
 
             yield return null;
         }
+
+        _loadingScenes.Remove(sceneName);
     }
 }
