@@ -9,19 +9,19 @@ public class CardSystem : Singleton<CardSystem>
     
     private void OnEnable()
     {
-        GameAbilitySystem.Instance.AddPerformer<PlayPlayerardGA>(PlayPlayerCardPerformer);
+        GameAbilitySystem.Instance.AddPerformer<PlayPlayerCardGA>(PlayPlayerCardPerformer);
         GameAbilitySystem.Instance.AddPerformer<DrawCardsGA>(DrawCardsPerformer);
         GameAbilitySystem.Instance.AddPerformer<DiscardPlayerCardsGA>(DiscardPlayerCardsPerformer);
     }
 
     private void OnDisable()
     {
-        GameAbilitySystem.Instance.RemovePerformer<PlayPlayerardGA>();
+        GameAbilitySystem.Instance.RemovePerformer<PlayPlayerCardGA>();
         GameAbilitySystem.Instance.RemovePerformer<DrawCardsGA>();
         GameAbilitySystem.Instance.RemovePerformer<DiscardPlayerCardsGA>();
     }
 
-    private IEnumerator PlayPlayerCardPerformer(PlayPlayerardGA playCardGa)
+    private IEnumerator PlayPlayerCardPerformer(PlayPlayerCardGA playCardGa)
     {
         Debug.Log("Play Card Performer");
 

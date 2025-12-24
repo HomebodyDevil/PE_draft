@@ -262,7 +262,7 @@ public class CardView :
 
     private void RequestPerformGameAbility()
     {
-        PlayPlayerardGA playPlayerCardGA = new(InBattleCard);
+        PlayPlayerCardGA playPlayerCardGA = new(InBattleCard);
         GameAbilitySystem.Instance.RequestPerformGameAbility(null, new() { playPlayerCardGA });
         
         CanInteract = false;

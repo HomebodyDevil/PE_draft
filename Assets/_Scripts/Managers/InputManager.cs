@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class InputManager : PersistantSingleton<InputManager>
@@ -11,7 +12,15 @@ public class InputManager : PersistantSingleton<InputManager>
     {
         base.Awake();
         PlayerActions = new PlayerActions();
+    }
 
-        PlayerActions.Enable();
+    private void OnEnable()
+    {
+        PlayerActions?.Enable();
+    }
+
+    private void OnDisable()
+    {
+        PlayerActions?.Disable();
     }
 }

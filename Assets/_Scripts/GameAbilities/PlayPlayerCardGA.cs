@@ -1,10 +1,10 @@
 using UnityEngine;
 
-public class PlayPlayerardGA : GameAbility
+public class PlayPlayerCardGA : GameAbility
 {
     public InBattleCard InBattleCardToPlay { get; set; }
 
-    public PlayPlayerardGA(InBattleCard inBattleCardToPlay)
+    public PlayPlayerCardGA(InBattleCard inBattleCardToPlay)
     {
         InBattleCardToPlay = inBattleCardToPlay;
     }

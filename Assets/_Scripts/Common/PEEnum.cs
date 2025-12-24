@@ -19,6 +19,15 @@ namespace PEEnum
         Friendly,
         Hostile,
     }
+    
+    public enum TargetType
+    {
+        None,
+        All,
+        Caster,
+        Friendly,
+        Hostile,
+    }
 
     public enum GAExecutor
     {
@@ -26,5 +35,4 @@ namespace PEEnum
         Enemy,
         Neutral,
     }
-    
 }

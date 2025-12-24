@@ -18,22 +18,14 @@ public class Character
         CurrentHealth = MaxHealth = characterData.MaxHealth;
         TeamType = characterData.TeamType;
     }
-    
-    public virtual void Damage(float damageAmount)
+
+    public void SetCurrentHealth(float health)
     {
-        CurrentHealth -= damageAmount;
-        Debug.Log($"Character damaged. CurrentHealth = {CurrentHealth}");
-        
-        if (CurrentHealth <= 0)
+        CurrentHealth = Mathf.Clamp(health, 0, MaxHealth);
+        if (CurrentHealth == 0)
         {
-            Debug.Log("died");    
+            Debug.Log("zero health");
         }
-        else
-        {
-            Debug.Log("Survived");
-        }
-        
-        CurrentHealth = Mathf.Max(0f, CurrentHealth);
     }
 
     public void AddAddedReaction(GameAbility reaction, PEEnum.ReactionTiming timing)

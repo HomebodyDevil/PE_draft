@@ -9,6 +9,11 @@ public abstract class Singleton<T> : MonoBehaviour where T: MonoBehaviour
     {
         if (Instance != null && Instance != this)
         {
+            if (gameObject == null)
+            {
+                Debug.Log("GameObject is Null");
+            }
+            
             Destroy(gameObject);
             return;
         }
