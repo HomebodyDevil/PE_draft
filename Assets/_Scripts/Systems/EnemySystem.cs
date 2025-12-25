@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class EnemySystem : Singleton<EnemySystem>
 {
-    [SerializeField] private Character _testEnemy;
+    [SerializeField] private EnemyCharacter _testEnemy;
     
     public List<Character> EnemyCharacters { get; private set; } = new();
 

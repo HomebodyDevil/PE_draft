@@ -17,6 +17,7 @@ public class PlayerCardSystem : Singleton<PlayerCardSystem>
     public float UseCardDistance { get; private set; }
 
     private Coroutine _drawCardsCoroutine;
+    private Coroutine _moveCardToGraveyardCoroutine;
 
     private int _pendingDrawCount = 0;
     
@@ -65,6 +66,16 @@ public class PlayerCardSystem : Singleton<PlayerCardSystem>
         if (_drawCardsCoroutine == null)
         {
             _drawCardsCoroutine = StartCoroutine(DrawCardsCoroutine());
+        }
+    }
+
+    public void DiscardCards(int count)
+    {
+        int realCnt = Mathf.Min(Hand.Count, count);
+        for (int i = 0; i < realCnt; i++)
+        {
+            if (Hand[0] == null) continue;
+            PlayerCardSystem.Instance?.OnCardMoveToGraveyard?.Invoke(Hand[0]);
         }
     }
 

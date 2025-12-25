@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -7,6 +8,11 @@ public class PlayerSystem : Singleton<PlayerSystem>
     [SerializeField] private Character _testPlayer;
     
     [field: SerializeField] public List<Character> PlayerCharacters { get; private set; } = new();
+
+    private void Start()
+    {
+        InitPlayerCharacters();
+    }
 
     public void InitPlayerCharacters()
     {

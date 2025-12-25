@@ -19,6 +19,11 @@ public class Character
         TeamType = characterData.TeamType;
     }
 
+    public void SetTeamType(TeamType teamType)
+    {
+        TeamType = teamType;
+    }
+
     public void SetCurrentHealth(float health)
     {
         CurrentHealth = Mathf.Clamp(health, 0, MaxHealth);
@@ -41,5 +46,10 @@ public class Character
         {
             AddedReactions.Add(timing, new List<GameAbility>() { reaction });
         }
+    }
+
+    public virtual void StartTurn()
+    {
+        Debug.Log("Character Start Turn");
     }
 }

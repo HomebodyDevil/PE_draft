@@ -63,6 +63,16 @@ public class CardSystem : Singleton<CardSystem>
     private IEnumerator DiscardPlayerCardsPerformer(DiscardPlayerCardsGA discardPlayerCardsGa)
     {
         Debug.Log("Discard Player Cards Performer");
+
+        if (discardPlayerCardsGa.DiscardAll)
+        {
+            PlayerCardSystem.Instance.DiscardCards(PlayerCardSystem.Instance.Hand.Count);
+        }
+        else
+        {
+            PlayerCardSystem.Instance.DiscardCards(discardPlayerCardsGa.DiscardCount);
+        }
+        
         yield break;
     }
 }
