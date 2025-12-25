@@ -6,7 +6,7 @@ using UnityEngine.AddressableAssets;
 public class EnemyCharacterViewSystem : Singleton<EnemyCharacterViewSystem>
 {
     [SerializeField] private List<Transform> _enemyCharacterPositions = new();
-    private List<CharacterView> _enemyCharacterViews = new();
+    public List<CharacterView> EnemyCharacterViews { get; private set; }= new();
     
     protected override void Awake()
     {
@@ -36,7 +36,7 @@ public class EnemyCharacterViewSystem : Singleton<EnemyCharacterViewSystem>
     
     private void EnableEnemyCharacterView(Character character)
     {
-        foreach (var view in _enemyCharacterViews)
+        foreach (var view in EnemyCharacterViews)
         {
             if (view.Character == character)
             {
@@ -47,7 +47,7 @@ public class EnemyCharacterViewSystem : Singleton<EnemyCharacterViewSystem>
 
     private void DisableEnemyCharacterView(Character character)
     {
-        foreach (var view in _enemyCharacterViews)
+        foreach (var view in EnemyCharacterViews)
         {
             if (view.Character == character)
             {
@@ -68,7 +68,7 @@ public class EnemyCharacterViewSystem : Singleton<EnemyCharacterViewSystem>
                     if (go.TryGetComponent<CharacterView>(out CharacterView characterView))
                     {
                         characterView.SetCharacter(EnemySystem.Instance.EnemyCharacters[i]);
-                        _enemyCharacterViews.Add(characterView);
+                        EnemyCharacterViews.Add(characterView);
                     }
                 }
             };

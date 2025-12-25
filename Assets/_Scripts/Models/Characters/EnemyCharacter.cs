@@ -24,6 +24,18 @@ public class EnemyCharacter : Character
 
     private IEnumerator EnemyTurnCoroutine()
     {
+        // CharacterView에서도 없애줘야 함.
+        Debug.Log("testText 사용하는 거 나중에 없애주기.");
+        Transform testText = null;
+        foreach (var charView in EnemyCharacterViewSystem.Instance.EnemyCharacterViews)
+        {
+            if (charView.Character == this)
+            {
+                testText = charView.Text;
+                testText.gameObject.SetActive(true);
+            }
+        }
+        
         yield return new WaitForSeconds(2.0f);
         
         Debug.Log("Done");
@@ -32,5 +44,6 @@ public class EnemyCharacter : Character
         GameAbilitySystem.Instance.RequestPerformGameAbility(this, new() { endTurnGA });
         
         _enemyTurnCoroutine = null;
+        testText.gameObject.SetActive(false);
     }
 }

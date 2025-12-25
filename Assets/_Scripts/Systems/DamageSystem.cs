@@ -65,7 +65,7 @@ public class DamageSystem : Singleton<DamageSystem>
             yield break;
         }
 
-        Debug.Log("여기도 나중에 바꿀 것.(지금은 적만 데미지 주고 있음)");
+        Debug.Log("여기도 나중에 바꿀 것.(지금은 적에게만 데미지 주고 있음)");
         int targetCnt = dealDamageToRandomTargetsGA.TargetCount;
         List<Character> targets = EnemySystem.Instance.EnemyCharacters.PickN(targetCnt);
         
