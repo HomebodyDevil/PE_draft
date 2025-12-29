@@ -10,6 +10,7 @@ public class Character
     public TeamType TeamType { get; private set; }
     // Character들은 본인이 등록한 Reaction에 관한 리스트를 hold한다.
     public Dictionary<PEEnum.ReactionTiming, List<GameAbility>> AddedReactions { get; private set; } = new();
+    public List<ReactionContext> Reactions { get; private set; } = new();
 
     public Character() { }
     
@@ -49,6 +50,16 @@ public class Character
         {
             AddedReactions.Add(timing, new List<GameAbility>() { reaction });
         }
+    }
+    
+    public void AddAddedReaction(ReactionContext reactionContext)
+    {
+        Reactions.Add(reactionContext);
+    }
+
+    public void RemoveAddedReaction(ReactionContext reactionContext)
+    {
+        Reactions.Remove(reactionContext);
     }
 
     public virtual void StartTurn()

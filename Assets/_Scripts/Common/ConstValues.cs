@@ -22,4 +22,6 @@ public static class ConstValue
     public const float DEFAULT_PLAYER_COST = 5f;
 
     public const int MAX_PERFORM_CHAIN_COUNT = 50;
+
+    public const int INFINITE_TURN_COUNT = -1234;
 }

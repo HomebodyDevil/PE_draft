@@ -47,69 +47,6 @@ using UnityEngine;
 //     }
 // }
 
-public class ReactionContext
-{
-    public Character ReactionPerformer { get; private set; } 
-    public GameAbility ReactionGA { get; private set; }
-    public PEEnum.ReactionTarget ReactionTarget { get; private set; }
-    // Reaction을 수행할 수 있는 턴
-    // i.e. ReactionCount가 3이다 -> 3턴 후, Reaction을 제거.
-    // -1234면, 무한으로 동작하는 걸로 설정할지 고민중.
-    public int ReactionCount { get; private set; }
-
-    public ReactionContext(
-        Character reactionPerformer,
-        GameAbility reactionGA,
-        PEEnum.ReactionTarget reactionTarget,
-        int reactionCount)
-    {
-        ReactionPerformer = reactionPerformer;
-        ReactionGA = reactionGA;
-        ReactionTarget = reactionTarget;
-        ReactionCount = reactionCount;
-    }
-
-    public bool IsValid()
-    {
-        if (ReactionPerformer == null)
-        {
-            Debug.Log("ReactionPerformer is null");
-            return false;
-        }
-
-        if (ReactionGA == null)
-        {
-            Debug.Log("ReactionGA is null");
-            return false;
-        }
-
-        if (ReactionTarget == PEEnum.ReactionTarget.None)
-        {
-            Debug.Log("ReactionTarget is None");
-            return false;
-        }
-
-        return true;
-    }
-
-    public bool Check(Character reactionPerformer, GameAbility reactionGA)
-    {
-        if (reactionPerformer == null) return false;
-        return Equals(ReactionPerformer, reactionPerformer) && 
-               reactionGA?.GetType() == ReactionGA?.GetType();
-    }
-    
-    public bool Same<T>(Character reactionPerformer, T reactionGA) where T : GameAbility
-    {
-        if (reactionPerformer == null || reactionGA == null)
-        {
-            Debug.Log("null ref");
-            return false;
-        }
-        return Equals(ReactionPerformer, reactionPerformer) && ReactionGA?.GetType() == reactionGA.GetType();
-    }
-}
-
 class PerformGameAbilityContext
 {
     public Character Caster { get; private set; }
@@ -125,7 +62,7 @@ class PerformGameAbilityContext
     }
 }
 
-public class GameAbilitySystem : Singleton<GameAbilitySystem>
+public class GameAbilitySystem : PersistantSingleton<GameAbilitySystem>
 {
     // private static Dictionary<ReactionKey, List<GameAbility>> _preReactions = new();
     // private static Dictionary<ReactionKey, List<GameAbility>> _postReactions = new();
@@ -251,10 +188,23 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
         {
             foreach (var reactionCtx in reactionCtxs)
             {
-                if (!reactionCtx.IsValid())
+                Debug.Log("진짜 리액숀");
+                
+                if (reactionCtx.NeedResponder && !reactionCtx.IsValid())
                 {
                     Debug.Log("Invalid reaction context");
                     continue;
+                }
+
+                if (reactionCtx.ReactionCount == 0)
+                {
+                    Type reactoinGAType = reactionCtx.ReactionGA.GetType();
+                    
+                    RemoveReaction(
+                        reactionCtx.TriggerType,
+                        reactoinGAType,
+                        reactionCtx.ReactionPerformer,
+                        reactionCtx.ReactionTiming);
                 }
             
                 List<Character> reactionTargets =
@@ -264,6 +214,11 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
                 {
                     targetGameAbility.Targets.Clear();
                     targetGameAbility.Targets.AddRange(reactionTargets);
+                }
+
+                if (reactionCtx.ReactionCount != ConstValue.INFINITE_TURN_COUNT)
+                {
+                    reactionCtx.ReduceReactionCount(1);
                 }
             
                 PerformGameAbilityContext gaCtx = new(reactionCtx.ReactionPerformer, reactionCtx.ReactionGA);
@@ -275,7 +230,10 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
         yield break;
     }
 
-    private List<Character> FindReactionTargets(PerformGameAbilityContext ctx, Character responder, PEEnum.ReactionTarget targetType)
+    private List<Character> FindReactionTargets(
+        PerformGameAbilityContext ctx, 
+        Character responder, 
+        PEEnum.ReactionTarget targetType)
     {
         List<Character> targets = new();
         
@@ -303,26 +261,35 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
         return targets;
     }
 
- /// <summary>
- /// T에 대한 Reaction을 등록합니다.
- /// </summary>
- /// <param name="responder"></param>
- /// <param name="reactionGA"></param>
- /// <param name="reactionTarget"></param>
- /// <param name="reactionCount"></param>
- /// <param name="timing"></param>
- /// <typeparam name="T">Reaction을 수행하게 될 일종의 트리거</typeparam>
+    /// <summary>
+    /// T에 대한 Reaction을 등록합니다.
+    /// </summary>
+    /// <param name="responder"></param>
+    /// <param name="reactionGA"></param>
+    /// <param name="reactionTarget"></param>
+    /// <param name="reactionCount"></param>
+    /// <param name="timing"></param>
+    /// <param name="needResponder"></param>
+    /// <typeparam name="T">Reaction을 수행하게 될 일종의 트리거</typeparam>
     public void AddReaction<T>(
+        PEEnum.ReactionTiming timing,   
         Character responder, 
         GameAbility reactionGA, 
         PEEnum.ReactionTarget reactionTarget, 
         int reactionCount, 
-        PEEnum.ReactionTiming timing) where T : GameAbility
+        bool needResponder) where T : GameAbility
     {
         var list = timing == PEEnum.ReactionTiming.Pre ? _preReactions : _postReactions;
 
         Type triggerType = typeof(T);
-        ReactionContext reactionCtx = new(responder, reactionGA, reactionTarget, reactionCount);
+        ReactionContext reactionCtx = 
+            new(responder, 
+                reactionGA, 
+                reactionTarget, 
+                reactionCount, 
+                timing,
+                needResponder,
+                triggerType);
 
         if (list.ContainsKey(triggerType))
         {
@@ -333,7 +300,8 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
             list[triggerType] = new() { reactionCtx };
         }
         
-        responder.AddAddedReaction(reactionGA, timing);
+        //responder.AddAddedReaction(reactionGA, timing);
+        responder.AddAddedReaction(reactionCtx);
     }
 
     // responder가 hold하고 있는, 그가 등록한 Reaction들의 리스트를 확인한다.(Timing이 맞는)
@@ -359,6 +327,39 @@ public class GameAbilitySystem : Singleton<GameAbilitySystem>
         Type reactionType = typeof(TReaction);
         
         if (!systemReactionDict.TryGetValue(typeof(TTrigger), out var systemReactionList))
+        {
+            Debug.Log("Cant find systemReactionList");
+            return;
+        }
+
+        for (int i = systemReactionList.Count - 1; i >= 0; i--)
+        {
+            var ctx = systemReactionList[i];
+            if (ReferenceEquals(ctx.ReactionPerformer, responder) && ctx.ReactionGA.GetType() == reactionType)
+            {
+                systemReactionList.RemoveAt(i);
+            }
+        }
+    }
+    
+    public void RemoveReaction(
+        Type triggerType,
+        Type reactionType,
+        Character responder, 
+        PEEnum.ReactionTiming timing) 
+    {
+        if (responder.AddedReactions.TryGetValue(timing, out var respondersList))
+        {
+            for (int i = respondersList.Count - 1; i >= 0; i--)
+            {
+                if (respondersList[i].GetType() == reactionType)
+                    respondersList.RemoveAt(i);
+            }
+        }
+        
+        var systemReactionDict = timing == PEEnum.ReactionTiming.Pre ? _preReactions : _postReactions;
+        
+        if (!systemReactionDict.TryGetValue(triggerType, out var systemReactionList))
         {
             Debug.Log("Cant find systemReactionList");
             return;
