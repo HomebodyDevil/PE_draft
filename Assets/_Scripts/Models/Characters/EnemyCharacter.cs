@@ -45,5 +45,11 @@ public class EnemyCharacter : Character
         
         _enemyTurnCoroutine = null;
         testText.gameObject.SetActive(false);
+        
+        // GameAbilitySystem.Instance.RemoveReaction(
+        //     Reactions[0].TriggerType,
+        //     Reactions[0].ReactionGA.GetType(),
+        //     this,
+        //     PEEnum.ReactionTiming.Pre);
     }
 }

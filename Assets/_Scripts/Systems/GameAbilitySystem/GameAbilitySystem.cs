@@ -186,10 +186,10 @@ public class GameAbilitySystem : PersistantSingleton<GameAbilitySystem>
         // 즉, ReactionContext들을 순회.
         if (reactions.TryGetValue(gaType, out var reactionCtxs))
         {
-            foreach (var reactionCtx in reactionCtxs)
+            var executingReactionCtxs = reactionCtxs.ToArray();
+            
+            foreach (var reactionCtx in executingReactionCtxs)
             {
-                Debug.Log("진짜 리액숀");
-                
                 if (reactionCtx.NeedResponder && !reactionCtx.IsValid())
                 {
                     Debug.Log("Invalid reaction context");
