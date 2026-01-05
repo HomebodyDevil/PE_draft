@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class MapNodeSystem : Singleton<MapNodeSystem>
 {
+    [Header("Scene Type")] 
+    [SerializeField] private bool _isEventScene = false;
+    
     [SerializeField] private GameObject _mapNodeViewPrefab;
     //[SerializeField, Range(3, 6)] private int _verticalNodeCount = 4;
     [SerializeField, Range(1, 10)] private int _maxNodeCountInLevel = 5;
@@ -30,7 +33,8 @@ public class MapNodeSystem : Singleton<MapNodeSystem>
 
     private void Start()
     {
-        CreateMapNodes();
+        if (!_isEventScene)
+            CreateMapNodes();
     }
 
     private void VarSetup()

@@ -46,6 +46,7 @@ public class EnemyCharacter : Character
         _enemyTurnCoroutine = null;
         testText.gameObject.SetActive(false);
         
+        // Reaction 잘 없어지는지 확인.
         // GameAbilitySystem.Instance.RemoveReaction(
         //     Reactions[0].TriggerType,
         //     Reactions[0].ReactionGA.GetType(),

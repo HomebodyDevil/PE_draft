@@ -10,6 +10,7 @@ public class PlayerStatus
     public float MaxCost { get; set; }
     public List<Character> PlayerCharacters { get; set; } = new();
     public List<Card> PlayerDeck { get; private set; } = new();
+    public GameFlags GameFlags { get; private set; }
 
     public PlayerStatus(
         PlayerStatusData data=null
@@ -20,6 +21,7 @@ public class PlayerStatus
             CurrentHealth = ConstValue.DEFAULT_PLAYER_HEALTH;
             MaxHealth = ConstValue.DEFAULT_PLAYER_HEALTH;
             MaxCost = ConstValue.DEFAULT_PLAYER_COST;
+            GameFlags = new();
 
             return;
         }
@@ -27,6 +29,7 @@ public class PlayerStatus
         CurrentHealth = data.MaxHealth;
         MaxHealth = data.MaxHealth;
         MaxCost = data.MaxCost;
+        GameFlags = new(data.InitialFlags);
 
         foreach (var characterData in data.CharactersData)
         {

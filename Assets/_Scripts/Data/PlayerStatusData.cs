@@ -8,4 +8,5 @@ public class PlayerStatusData : ScriptableObject
     [field: SerializeField] public float MaxCost { get; private set; }
     [field: SerializeField] public List<CardData> Deck { get; private set; }
     [field: SerializeField] public List<CharacterData> CharactersData { get; private set; }
+    [field: SerializeField] public List<string> InitialFlags { get; private set; }
 }
