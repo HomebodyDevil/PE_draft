@@ -63,6 +63,12 @@ public class DialogueService : PersistantSingleton<DialogueService>
 
     public void EnableDialogue(bool enable=true, string path="", int dialogueLineId=0)
     {
+        if (enable == false)
+        {
+            OnSetDialogueVisible?.Invoke(false);
+            return;
+        }
+        
         if (String.IsNullOrEmpty(path))
         {
             Debug.Log("Invalid Dialogue Path");
