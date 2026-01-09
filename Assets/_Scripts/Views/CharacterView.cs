@@ -24,6 +24,7 @@ public class CharacterView : MonoBehaviour
         {
             TestGA ga = new("Reacting to TurnEnd");
             
+            Debug.Log("Test Reaction 등록");
             GameAbilitySystem.Instance.AddReaction<EndCharacterTurnGA>(
                 ReactionTiming.Pre,
                 Character,

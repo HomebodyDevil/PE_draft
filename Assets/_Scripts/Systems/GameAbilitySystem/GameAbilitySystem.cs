@@ -62,7 +62,7 @@ class PerformGameAbilityContext
     }
 }
 
-public class GameAbilitySystem : PersistantSingleton<GameAbilitySystem>
+public class GameAbilitySystem : Singleton<GameAbilitySystem>
 {
     // private static Dictionary<ReactionKey, List<GameAbility>> _preReactions = new();
     // private static Dictionary<ReactionKey, List<GameAbility>> _postReactions = new();

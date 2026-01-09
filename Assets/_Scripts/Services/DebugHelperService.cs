@@ -34,6 +34,8 @@ public class DebugHelperService : PersistantSingleton<DebugHelperService>
 
     private IEnumerator TestGAPerformer(TestGA testGA)
     {
+        Debug.Log("Perform Test GA");
+        
         _text.text = testGA.Text;
         yield return new WaitForSeconds(0.7f);
         

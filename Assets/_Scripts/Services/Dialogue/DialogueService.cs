@@ -12,16 +12,19 @@ public class DialogueService : PersistantSingleton<DialogueService>
     public Action<DialogueLine> OnSetCurrentDialogueLine;
     public Action OnDialogueClick;
     public Action OnDialogueEnd;
+    public Action OnPlayDialogue;
     public Action<bool> OnEnableClickPreventer;
+    public Action<List<DialogueLine>> OnSetChoices;
+    public Action OnMadeChoice;
     
-    private List<DialogueLine> _currentDialogueLines;
+    public List<DialogueLine> CurrentDialogueLines { get; private set; }
     private DialogueLine _currentDialogueLine;
     private int _currentDialogueLineId = -10;
     
     private void Start()
     {
         Debug.Log("임시로 한 것. 나중에 바꾸기(DialogueService Start)");
-        //EnableDialogue(true, "P&E_Dialogue.csv");
+        //EnableDialogue(true, "TestDialogue.csv");
     }
 
     private void OnEnable()
@@ -37,6 +40,7 @@ public class DialogueService : PersistantSingleton<DialogueService>
     private void DialogueClick()
     {
         Debug.Log("임시로 한 것. 나중에 바꾸기(DialogueService DialogueClick)");
+        // id가 -10이라면, 아직 한 번도 사용?하지 않았다는 의미.
         if (_currentDialogueLineId == -10)
         {
             SetCurrentDialogueLineId(0);
@@ -87,7 +91,7 @@ public class DialogueService : PersistantSingleton<DialogueService>
             
             CSVReader cr = new();
             Debug.Log(currentDialogueLineText);
-            _currentDialogueLines = cr.MakeDialogueLinesFromCSV(currentDialogueLineText);
+            CurrentDialogueLines = cr.MakeDialogueLinesFromCSV(currentDialogueLineText);
             
             SetCurrentDialogueLineId(dialogueLineId);
             DialogueService.Instance.OnEnableClickPreventer?.Invoke(false);
@@ -96,6 +100,7 @@ public class DialogueService : PersistantSingleton<DialogueService>
 
     public void SetCurrentDialogueLineId(int lineId)
     {
+        // lineId가 -1이란 것은, 현재 Line이 마지막이란 뜻.
         if (lineId == -1)
         {
             OnSetDialogueVisible?.Invoke(false);
@@ -105,23 +110,30 @@ public class DialogueService : PersistantSingleton<DialogueService>
         
         _currentDialogueLineId = lineId;
         SetCurrentDialogueLine(_currentDialogueLineId);
+        PerformDialogueAction(_currentDialogueLineId);
+    }
+
+    private void PerformDialogueAction(int lineId)
+    {
+        
     }
 
     private void SetCurrentDialogueLine(int lineId)
     {
         _currentDialogueLine = FindDialogueLineByID(lineId);
         OnSetCurrentDialogueLine?.Invoke(_currentDialogueLine);
+        OnPlayDialogue?.Invoke();
     }
 
     private DialogueLine FindDialogueLineByID(int lineId)
     {
-        if (_currentDialogueLines == null)
+        if (CurrentDialogueLines == null)
         {
             Debug.Log("CurrentDialogueLine is null");
             return null;
         }
         
-        foreach (var dialogueLine in _currentDialogueLines)
+        foreach (var dialogueLine in CurrentDialogueLines)
         {
             if (dialogueLine.Id == lineId)
             {

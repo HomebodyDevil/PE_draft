@@ -10,7 +10,7 @@ public class DialogueLine
     public string DialogueText { get; private set; }
     public int NextDialogueId { get; private set; }
     public List<string> Condition { get; private set; }
-    public List<string> Choices { get; private set; }
+    public List<int> Choices { get; private set; }
     public List<string> Actions { get; private set; }
 
     public DialogueLine(
@@ -28,7 +28,7 @@ public class DialogueLine
         DialogueText = dialogueText;
         NextDialogueId = int.Parse(nextDialogueId);
         // Condition = condition;
-        // Choices = choices;
+        Choices = GetChoices(choices);
         // Actions = actions;
     }
 
@@ -39,7 +39,33 @@ public class DialogueLine
         DialogueText = vars[2];
         NextDialogueId = int.Parse(vars[3]);
         // Condition = condition;
-        // Choices = choices;
+        Choices = GetChoices(vars[5]);
         // Actions = actions;
+    }
+
+    private void GetConditions(string conditionsStr)
+    {
+        
+    }
+    
+    private List<int> GetChoices(string choicesStr)
+    {
+        string[] choices = choicesStr.Split(',');
+        List<int> choiceIds = new();
+        
+        foreach (var choice in choices)
+        {
+            if (String.IsNullOrEmpty(choice)) continue;
+            
+            int choiceId = int.Parse(choice.Trim());
+            choiceIds.Add(choiceId);
+        }
+        
+        return choiceIds;
+    }
+
+    private void GetActions(string actionsStr)
+    {
+        
     }
 }
