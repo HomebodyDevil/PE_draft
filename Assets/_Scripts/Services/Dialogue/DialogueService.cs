@@ -52,20 +52,6 @@ public class DialogueService : PersistantSingleton<DialogueService>
         }
     }
 
-    // public void GetDialogueLines(string path)
-    // {
-    //     Addressables.LoadAssetAsync<TextAsset>(path).Completed += handle =>
-    //     {
-    //         string currentDialogueLineText = handle.Result.text;
-    //         //GetDialogueLineFromCSV(currentDialogueLineText);
-    //         
-    //         CSVReader cr = new();
-    //         Debug.Log(currentDialogueLineText);
-    //         _currentDialogueLines = cr.MakeDialogueLinesFromCSV(currentDialogueLineText);
-    //         //Debug.Log(_currentDialogueLines.Count);
-    //     };
-    // }
-
     public void EnableDialogue(bool enable=true, string path="", int dialogueLineId=0)
     {
         if (enable == false)
@@ -81,6 +67,7 @@ public class DialogueService : PersistantSingleton<DialogueService>
             return;
         }
         
+        DialogueService.Instance.OnEnableClickPreventer?.Invoke(true);
         OnSetDialogueVisible?.Invoke(enable);
 
         path = $"Assets/Medias/Dialogues/{path}.csv";
@@ -144,10 +131,4 @@ public class DialogueService : PersistantSingleton<DialogueService>
         Debug.Log($"Theres no DialogueLine with ID {lineId}");
         return null;
     }
-
-    // private void GetDialogueLineFromCSV(string csvStr)
-    // {
-    //     CSVReader cr = new();
-    //     _currentDialogueLines = cr.MakeDialogueLinesFromCSV(csvStr);
-    // }
 }

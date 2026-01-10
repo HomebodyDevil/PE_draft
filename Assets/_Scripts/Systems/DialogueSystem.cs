@@ -23,6 +23,8 @@ public class DialogueSystem : Singleton<DialogueSystem>
     [SerializeField] private Button _clickCatcher;
     [SerializeField] private Transform _clickPreventer;
 
+    public DialogueActionExecutor DialogueActionExecutor { get; } = new();
+    
     private Coroutine _playDialogueCoroutine;
     private DialogueLine _currentDialogueLine;
     private string _currentDialogue;
@@ -165,13 +167,13 @@ public class DialogueSystem : Singleton<DialogueSystem>
 
     private IEnumerator PlayDialogueCoroutine()
     {
-        _playDialogueCoroutine = null;
-
         if (_currentDialogueLine.Choices.Count > 0)
         {
             _choiceButtonsPanel.gameObject.SetActive(true);
             SetChoices(_currentDialogueLine);
         }
+        
+        _playDialogueCoroutine = null;
         
         yield break;
     }
