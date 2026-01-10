@@ -12,7 +12,7 @@ public class DialogueLine
     public int NextDialogueId { get; private set; }
     public List<string> Condition { get; private set; }
     public List<int> Choices { get; private set; }
-    public List<string> Actions { get; private set; }
+    public List<DialogueActionContext> Actions { get; private set; }
 
     public DialogueLine(
         string id,
@@ -30,7 +30,7 @@ public class DialogueLine
         NextDialogueId = int.Parse(nextDialogueId);
         // Condition = condition;
         Choices = GetChoices(choices);
-        // Actions = actions;
+        Actions = GetActions(actions);
     }
 
     public DialogueLine(List<string> vars)
@@ -41,7 +41,7 @@ public class DialogueLine
         NextDialogueId = int.Parse(vars[3]);
         // Condition = condition;
         Choices = GetChoices(vars[5]);
-        // Actions = actions;
+        Actions = GetActions(vars[6]);
     }
 
     private void GetConditions(string conditionsStr)
@@ -65,8 +65,8 @@ public class DialogueLine
         return choiceIds;
     }
 
-    private void GetActions(string actionsStr)
+    private List<DialogueActionContext> GetActions(string actionsStr)
     {
-        
+        return null;
     }
 }

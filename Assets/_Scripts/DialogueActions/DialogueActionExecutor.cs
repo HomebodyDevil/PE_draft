@@ -15,7 +15,7 @@ public class DialogueActionExecutor
     // 수행중인 Action을 hold하고 있도록 한 건데, 필요할지 모르겠음.
     //private readonly Dictionary<string, List<Coroutine>> _performing = new();
 
-    public void ExecuteDialogueAction(string functionName, object[] args)
+    public void ExecuteDialogueAction(string functionName, List<string> args)
     {
         if (_actions.TryGetValue(functionName, out DialogueAction action))
         {

@@ -11,25 +11,28 @@ public class DialogueSystem : Singleton<DialogueSystem>
     [SerializeField] private bool _InitialVisible = false;
     [Space(10f)]
     
-    [SerializeField] private Transform _dialogueCanvas;
-    [SerializeField] private Transform _dialoguePanel;
-    [SerializeField] private Transform _backgroundPanel;
-    [SerializeField] private Transform _choiceButtonsPanel;
-    [SerializeField] private Transform _speakerImages;
-    [SerializeField] private Transform _speakerImageLeftPos;
-    [SerializeField] private Transform _speakerImageRightPos;
-    [SerializeField] private TextMeshProUGUI _speakerNameText;
-    [SerializeField] private TextMeshProUGUI _dialogueText;
-    [SerializeField] private Button _clickCatcher;
-    [SerializeField] private Transform _clickPreventer;
-
+    [SerializeField] private List<ChoiceButton> _choiceButtons = new(); 
+    
     public DialogueActionExecutor DialogueActionExecutor { get; } = new();
+    
+    private Transform _dialogueCanvas;
+    private Transform _dialoguePanel;
+    private Transform _backgroundPanel;
+    private Transform _choiceButtonsPanel;
+    private Transform _speakerImages;
+    private Transform _speakerImageLeftPos;
+    private Transform _speakerImageRightPos;
+    private Transform _speakerImageMiddlePos;
+    private TextMeshProUGUI _speakerNameText;
+    private TextMeshProUGUI _dialogueText;
+    private Button _clickCatcher;
+    private Transform _clickPreventer;
+
     
     private Coroutine _playDialogueCoroutine;
     private DialogueLine _currentDialogueLine;
     private string _currentDialogue;
 
-    [SerializeField] private List<ChoiceButton> _choiceButtons = new(); 
     
     protected override void Awake()
     {
@@ -74,6 +77,7 @@ public class DialogueSystem : Singleton<DialogueSystem>
         if (_dialogueText == null) transform.AssignChildVar<TextMeshProUGUI>("DialogueText", ref _dialogueText);
         if (_speakerImages == null) transform.AssignChildVar<Transform>("SpeakerImages", ref _speakerImages);
         if (_speakerImageLeftPos == null) transform.AssignChildVar<Transform>("SpeakerImageLeftPos", ref _speakerImageLeftPos);
+        if (_speakerImageMiddlePos == null) transform.AssignChildVar<Transform>("SpeakerImageMiddlePos", ref _speakerImageMiddlePos);
         if (_speakerImageRightPos == null) transform.AssignChildVar<Transform>("SpeakerImageRightPos", ref _speakerImageRightPos);
         if (_speakerNameText == null) transform.AssignChildVar<TextMeshProUGUI>("SpeakerNameText", ref _speakerNameText);
         if (_clickCatcher == null) transform.AssignChildVar<Button>("ClickCatcher", ref _clickCatcher);
@@ -106,6 +110,20 @@ public class DialogueSystem : Singleton<DialogueSystem>
         if (dialogueLine == null) return;
         
         _currentDialogueLine =  dialogueLine;
+
+        if (DialogueActionExecutor == null)
+        {
+            Debug.Log("DialogueActionExecutor is null");
+        }
+        else
+        {
+            foreach (var action in dialogueLine.Actions)
+            {
+                DialogueActionExecutor.ExecuteDialogueAction(
+                    action.FunctionName,
+                    action.Parameters);
+            }
+        }
         
         SetSpeakerName(_currentDialogueLine.Speaker);
         SetDialogueText(_currentDialogueLine.DialogueText);

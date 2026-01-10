@@ -1,17 +1,19 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class AddPortraitDialogueAction : DialogueAction
 {
-    public override Coroutine Execute(object[] args)
+    public override Coroutine Execute(List<string> strArgs)
     {
-        return CoroutineRunnerService.Instance.StartCoroutine(ExecuteCoroutine(args));
+        Validate(strArgs);
+        StringToArgs(strArgs);
+        
+        return CoroutineRunnerService.Instance.StartCoroutine(ExecuteCoroutine());
     }
     
-    protected override IEnumerator ExecuteCoroutine(object[] args)
+    protected override IEnumerator ExecuteCoroutine()
     {
-        Validate(args);
-        
         throw new System.NotImplementedException();
     }
 
@@ -20,8 +22,13 @@ public class AddPortraitDialogueAction : DialogueAction
         throw new System.NotImplementedException();
     }
 
-    protected override void Validate(object[] args)
+    protected override void Validate(List<string> args)
     {
         Debug.Log("Validate arguments");
+    }
+
+    protected override void StringToArgs(List<string> args)
+    {
+        throw new System.NotImplementedException();
     }
 }
