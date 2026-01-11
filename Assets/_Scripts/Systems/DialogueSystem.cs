@@ -49,7 +49,7 @@ public class DialogueSystem : Singleton<DialogueSystem>
         _clickCatcher.onClick.AddListener(OnClickClockCatcher);
         
         SetDialogueVisible(_InitialVisible);
-        AddPortrait(2, "TEST", "");
+        //AddPortrait(2, "TEST", "");
     }
 
     private void OnEnable()
@@ -118,7 +118,7 @@ public class DialogueSystem : Singleton<DialogueSystem>
         {
             Debug.Log("DialogueActionExecutor is null");
         }
-        else
+        else if (dialogueLine.Actions != null && dialogueLine.Actions.Count > 0)
         {
             foreach (var action in dialogueLine.Actions)
             {

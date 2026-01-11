@@ -5,10 +5,10 @@ using System.Globalization;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-public struct DialogueActionContext
+public class DialogueActionContext
 {
     public string FunctionName;
-    public List<string> Parameters;
+    public List<string> Parameters = new();
 }
 
 public abstract class DialogueAction

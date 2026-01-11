@@ -99,12 +99,6 @@ public class DialogueService : PersistantSingleton<DialogueService>
         
         _currentDialogueLineId = lineId;
         SetCurrentDialogueLine(_currentDialogueLineId);
-        PerformDialogueAction(_currentDialogueLineId);
-    }
-
-    private void PerformDialogueAction(int lineId)
-    {
-        
     }
 
     private void SetCurrentDialogueLine(int lineId)
