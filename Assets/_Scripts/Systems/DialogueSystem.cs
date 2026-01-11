@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 
 public class DialogueSystem : Singleton<DialogueSystem>
@@ -32,7 +34,7 @@ public class DialogueSystem : Singleton<DialogueSystem>
     private Coroutine _playDialogueCoroutine;
     private DialogueLine _currentDialogueLine;
     private string _currentDialogue;
-
+    private Dictionary<int, List<SpeakerPortrait>> _speakerPortraits = new();
     
     protected override void Awake()
     {
@@ -47,6 +49,7 @@ public class DialogueSystem : Singleton<DialogueSystem>
         _clickCatcher.onClick.AddListener(OnClickClockCatcher);
         
         SetDialogueVisible(_InitialVisible);
+        AddPortrait(2, "TEST", "");
     }
 
     private void OnEnable()
@@ -194,5 +197,80 @@ public class DialogueSystem : Singleton<DialogueSystem>
         _playDialogueCoroutine = null;
         
         yield break;
+    }
+
+    private Transform GetPos(int pos)
+    {
+        return pos switch
+        {
+            1 => _speakerImageMiddlePos,
+            2 => _speakerImageRightPos,
+            _ => _speakerImageLeftPos
+        };
+    }
+
+    private string GetSpritePath(string path)
+    {
+        if (string.IsNullOrEmpty(path))
+        {
+            Debug.Log("Path is null or empty");
+            return "Assets/Medias/TestMedias/플로로.png";
+        }
+
+        return $"Assets/Medias/Dialogues/images/{path}.png";
+    }
+
+    private void SetPortraitPosition()
+    {
+        
+    }
+
+    /// <summary></summary>
+    /// <param name="position">0~2까지의 값. 0=Left ~ 2=Right</param>
+    /// <param name="characterName">SpeakerPortrait에 설정할 Name</param>
+    /// <param name="initialPortraitSpritePath">Portrait에 사용할 이미지(Sprite)</param>
+    public void AddPortrait(
+        int position, 
+        string characterName, 
+        string initialPortraitSpritePath)
+    {
+        Transform pos = GetPos(position);
+        initialPortraitSpritePath = GetSpritePath(initialPortraitSpritePath);
+        
+        Addressables.LoadAssetAsync<GameObject>(AssetPath.SpeakerPortraitPrefab).Completed += handle =>
+        {
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Debug.Log("Failed to load portrait prefab");
+                Addressables.Release(handle);
+                return;
+            }
+            
+            GameObject go = Instantiate(handle.Result, pos, false);
+            SpeakerPortrait speakerPortrait = go.GetComponent<SpeakerPortrait>();
+
+            Addressables.Release(handle);
+            
+            Addressables.LoadAssetAsync<Sprite>(initialPortraitSpritePath).Completed += spriteHandle =>
+            {
+                if (speakerPortrait == null)
+                {
+                    Debug.Log("SpeakerPortrait is null");
+                    return;
+                }
+
+                speakerPortrait.SetImage(spriteHandle.Result);
+                speakerPortrait.SetName(characterName);
+
+                if (!_speakerPortraits.ContainsKey(position))
+                {
+                    _speakerPortraits[position] = new();
+                }
+                
+                Addressables.Release(spriteHandle);
+                
+                _speakerPortraits[position].Add(speakerPortrait);
+            };
+        };
     }
 }

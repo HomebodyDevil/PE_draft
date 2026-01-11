@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Prefab
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Prefab
+  m_GUID: c83a6ccb0874de04984913f5f8d9a0cd
+  m_SerializeEntries:
+  - m_GUID: 5d10b25def0279444a027e3a8a4dec8c
+    m_Address: Assets/Prefabs/Views/UI/Dialogue/SpeakerPortrait.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 530a06f2fcea6d54aa419b98c20febe5, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 5d6e3435e11fe5a4c854b3c706e0b764, type: 2}
+    - {fileID: 11400000, guid: baa7edfaa40bc1d43bcddff63ddcab50, type: 2}

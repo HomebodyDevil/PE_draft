@@ -82,6 +82,8 @@ public class DialogueService : PersistantSingleton<DialogueService>
             
             SetCurrentDialogueLineId(dialogueLineId);
             DialogueService.Instance.OnEnableClickPreventer?.Invoke(false);
+
+            Addressables.Release(handle);
         };
     }
 

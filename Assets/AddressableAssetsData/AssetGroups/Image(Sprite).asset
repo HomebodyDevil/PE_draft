@@ -1,0 +1,28 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: Image(Sprite)
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: Image(Sprite)
+  m_GUID: 9291c5a0bea5fef4486e108373aac4f5
+  m_SerializeEntries:
+  - m_GUID: feabe4d81416a0b46bcb3dd464a907a0
+    m_Address: "Assets/Medias/TestMedias/\uD50C\uB85C\uB85C.png"
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 530a06f2fcea6d54aa419b98c20febe5, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 42f3d1a8749411647ba1e706187a2ddb, type: 2}
+    - {fileID: 11400000, guid: f8755aa8ea647d247af3e358445448cd, type: 2}
