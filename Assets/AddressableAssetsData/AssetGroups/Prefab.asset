@@ -18,7 +18,8 @@ MonoBehaviour:
   - m_GUID: 5d10b25def0279444a027e3a8a4dec8c
     m_Address: Assets/Prefabs/Views/UI/Dialogue/SpeakerPortrait.prefab
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - SpeakerPortraitPrefab
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 530a06f2fcea6d54aa419b98c20febe5, type: 2}

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 public class DialogueParser
 {
@@ -98,6 +99,12 @@ public class DialogueParser
             }
             
             sb.Append(currentChar);
+        }
+
+        foreach (var a in actions)
+        {
+            foreach (var p in a.Parameters)
+                Debug.Log($"{a.FunctionName}: {p}");
         }
         
         // Finalize 하기

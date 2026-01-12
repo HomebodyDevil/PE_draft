@@ -399,7 +399,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueSystem
   _InitialVisible: 0
-  _choiceButtons: []
+  _speakerPortraitLabel:
+    m_LabelString: SpeakerPortraitPrefab
 --- !u!1 &3567666016550605078
 GameObject:
   m_ObjectHideFlags: 0

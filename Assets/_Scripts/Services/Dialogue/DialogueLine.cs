@@ -68,7 +68,7 @@ public class DialogueLine
     private List<DialogueActionContext> GetActions(string actionsStr)
     {
         DialogueParser parser = new DialogueParser();
-        List<DialogueActionContext> actions = new List<DialogueActionContext>();
+        List<DialogueActionContext> actions = parser.ActionParser(actionsStr);
         
         return actions;
     }

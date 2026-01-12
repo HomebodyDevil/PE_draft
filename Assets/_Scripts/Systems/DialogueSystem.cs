@@ -11,9 +11,10 @@ public class DialogueSystem : Singleton<DialogueSystem>
 {
     [Header("Initialize Settings")] 
     [SerializeField] private bool _InitialVisible = false;
+    [SerializeField] private AssetLabelReference _speakerPortraitLabel;
     [Space(10f)]
     
-    [SerializeField] private List<ChoiceButton> _choiceButtons = new(); 
+    private List<ChoiceButton> _choiceButtons = new(); 
     
     public DialogueActionExecutor DialogueActionExecutor { get; } = new();
     
@@ -49,7 +50,18 @@ public class DialogueSystem : Singleton<DialogueSystem>
         _clickCatcher.onClick.AddListener(OnClickClockCatcher);
         
         SetDialogueVisible(_InitialVisible);
-        //AddPortrait(2, "TEST", "");
+    }
+
+    private void OnDestroy()
+    {
+        foreach (var portraitListDict in _speakerPortraits)
+        {
+            foreach (var portraits in portraitListDict.Value)
+            {
+                if (portraits == null) continue;
+                Addressables.ReleaseInstance(portraits.gameObject);
+            }   
+        }
     }
 
     private void OnEnable()
@@ -214,15 +226,10 @@ public class DialogueSystem : Singleton<DialogueSystem>
         if (string.IsNullOrEmpty(path))
         {
             Debug.Log("Path is null or empty");
-            return "Assets/Medias/TestMedias/플로로.png";
+            return "Assets/Medias/TestMedias/TestImage.png";
         }
 
         return $"Assets/Medias/Dialogues/images/{path}.png";
-    }
-
-    private void SetPortraitPosition()
-    {
-        
     }
 
     /// <summary></summary>
@@ -236,41 +243,75 @@ public class DialogueSystem : Singleton<DialogueSystem>
     {
         Transform pos = GetPos(position);
         initialPortraitSpritePath = GetSpritePath(initialPortraitSpritePath);
-        
-        Addressables.LoadAssetAsync<GameObject>(AssetPath.SpeakerPortraitPrefab).Completed += handle =>
+
+        Addressables.InstantiateAsync(_speakerPortraitLabel, pos, false).Completed += (h) =>
         {
-            if (handle.Status != AsyncOperationStatus.Succeeded)
+            if (h.Status != AsyncOperationStatus.Succeeded)
             {
-                Debug.Log("Failed to load portrait prefab");
-                Addressables.Release(handle);
+                Debug.Log("Failed to create portrait prefab");
                 return;
             }
-            
-            GameObject go = Instantiate(handle.Result, pos, false);
-            SpeakerPortrait speakerPortrait = go.GetComponent<SpeakerPortrait>();
 
-            Addressables.Release(handle);
+            if (!_speakerPortraits.ContainsKey(position))
+                _speakerPortraits[position] = new();
             
-            Addressables.LoadAssetAsync<Sprite>(initialPortraitSpritePath).Completed += spriteHandle =>
+            _speakerPortraits[position].Add(h.Result.GetComponent<SpeakerPortrait>());
+
+            Addressables.LoadAssetAsync<Sprite>(initialPortraitSpritePath).Completed += h_sp =>
             {
-                if (speakerPortrait == null)
+                if (h.Result.TryGetComponent(out SpeakerPortrait speakerPortrait))
                 {
-                    Debug.Log("SpeakerPortrait is null");
-                    return;
+                    speakerPortrait.SetImage(h_sp.Result);
+                    speakerPortrait.SetVisible(true);
+                    
+                    speakerPortrait.GameObjectOperationHandle = h;
+                    speakerPortrait.SpriteOperationHandle = h_sp;
                 }
-
-                speakerPortrait.SetImage(spriteHandle.Result);
-                speakerPortrait.SetName(characterName);
-
-                if (!_speakerPortraits.ContainsKey(position))
-                {
-                    _speakerPortraits[position] = new();
-                }
-                
-                Addressables.Release(spriteHandle);
-                
-                _speakerPortraits[position].Add(speakerPortrait);
             };
         };
+
+        // Addressables.LoadAssetAsync<GameObject>(AssetPath.SpeakerPortraitPrefab).Completed += handle =>
+        // {
+        //     if (handle.Status != AsyncOperationStatus.Succeeded)
+        //     {
+        //         Debug.Log("Failed to load portrait prefab");
+        //         Addressables.Release(handle);
+        //         return;
+        //     }
+        //     
+        //     GameObject go = Instantiate(handle.Result, pos, false);
+        //     SpeakerPortrait speakerPortrait = go.GetComponent<SpeakerPortrait>();
+        //
+        //     Addressables.Release(handle);
+        //     
+        //     Addressables.LoadAssetAsync<Sprite>(initialPortraitSpritePath).Completed += spriteHandle =>
+        //     {
+        //         if (speakerPortrait == null)
+        //         {
+        //             Debug.Log("SpeakerPortrait is null");
+        //             return;
+        //         }
+        //         
+        //         if (spriteHandle.Status != AsyncOperationStatus.Succeeded)
+        //         {
+        //             Debug.Log("Failed to load portrait sprite");
+        //             Addressables.Release(spriteHandle);
+        //             return;
+        //         }
+        //         
+        //         Sprite speakerSprite = Instantiate<Sprite>(spriteHandle.Result);
+        //
+        //         speakerPortrait.SetImage(speakerSprite);
+        //         speakerPortrait.SetName(characterName);
+        //
+        //         if (!_speakerPortraits.ContainsKey(position))
+        //         {
+        //             _speakerPortraits[position] = new();
+        //         }
+        //         
+        //         _speakerPortraits[position].Add(speakerPortrait);
+        //         Addressables.Release(spriteHandle);
+        //     };
+        // };
     }
 }

@@ -4,6 +4,10 @@ using UnityEngine;
 
 public class AddPortraitDialogueAction : DialogueAction
 {
+    private int _pos = 0;
+    private string _characterName = "Character";
+    private string _initialPortraitPath = "";
+    
     public override Coroutine Execute(List<string> strArgs)
     {
         Validate(strArgs);
@@ -14,7 +18,13 @@ public class AddPortraitDialogueAction : DialogueAction
     
     protected override IEnumerator ExecuteCoroutine()
     {
-        throw new System.NotImplementedException();
+        DialogueSystem.Instance.AddPortrait(
+            _pos,
+            _characterName,
+            _initialPortraitPath
+            );
+
+        yield break;
     }
 
     protected override void CompleteAction()
@@ -29,6 +39,8 @@ public class AddPortraitDialogueAction : DialogueAction
 
     protected override void StringToArgs(List<string> args)
     {
-        throw new System.NotImplementedException();
+        if (args.Count >= 1) _pos = StringToArg<int>(args[0]);
+        if (args.Count >= 2) _characterName = StringToArg<string>(args[1]);
+        if (args.Count >= 3) _initialPortraitPath = StringToArg<string>(args[2]);
     }
 }

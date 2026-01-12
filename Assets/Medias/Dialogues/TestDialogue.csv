@@ -1,9 +1,10 @@
 Id,Speaker,Text,NextId,Condition,Choices,Actions
-0,TEST,Hi. Click to continue the dialogue.,1,,"1000, 1001",
-1,TEST,Good,2,,,
-2, TEST2,Good2,3,,,
-3, TEST2,Good3,4,,,
-4, TEST2,Good4,5,,,
-5, TEST2,Good5,-1,,,
-1000,TEST_CHOICE,What1,1,,,
-1001,TEST_CHOICE,What2,4,,,
+0,Beauty,"Hi, Click to continue the dialogue",1,,,"AddPortrait(0,TestCharacter,)"
+1,Beauty,Good,2,,,
+2,Beauty,Good2,3,,,
+3,Beauty,Good3,4,,,
+4,Beauty,Good4,5,,,
+5,Beauty,Good5,-1,,"1000, 1001",
+1000,TEST_CHOICE,So what? I'm pretty,6,,,
+1001,TEST_CHOICE,So what? I'm pretty~,6,,,
+6,Real Beauty,It's true.,-1,,,

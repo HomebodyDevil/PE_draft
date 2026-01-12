@@ -16,7 +16,7 @@ MonoBehaviour:
   m_GUID: 9291c5a0bea5fef4486e108373aac4f5
   m_SerializeEntries:
   - m_GUID: feabe4d81416a0b46bcb3dd464a907a0
-    m_Address: "Assets/Medias/TestMedias/\uD50C\uB85C\uB85C.png"
+    m_Address: Assets/Medias/TestMedias/TestImage.png
     m_ReadOnly: 0
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0
