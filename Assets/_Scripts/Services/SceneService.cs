@@ -29,7 +29,7 @@ public class SceneService : PersistantSingleton<SceneService>
         while (!loadSceneOP.isDone)
         {
             time += Time.deltaTime;
-            Debug.Log($"load Scene Progress :  {loadSceneOP.progress * 100}%");
+            //Debug.Log($"load Scene Progress :  {loadSceneOP.progress * 100}%");
 
             if (time >= _minWaitTime)
             {

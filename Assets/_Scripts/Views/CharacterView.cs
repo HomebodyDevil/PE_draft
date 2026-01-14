@@ -1,6 +1,7 @@
 using System;
 using PEEnum;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 public class CharacterView : MonoBehaviour
 {
@@ -18,7 +19,8 @@ public class CharacterView : MonoBehaviour
 
     private void Start()
     {
-        Text.gameObject.SetActive(false);
+        if (Text != null)
+            Text.gameObject.SetActive(false);
         
         if (Character.TeamType.Team == Team.Enemy)
         {

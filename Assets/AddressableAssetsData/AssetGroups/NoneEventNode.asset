@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: NoneEventNode
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: NoneEventNode
+  m_GUID: bc8ecec279b2471459408b0e4f4f0a5d
+  m_SerializeEntries:
+  - m_GUID: 6b1c61dd5db4b83499579fbd612848f3
+    m_Address: Assets/Datas/MapNodeDatas/TestMapNodeData 1.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - NoneEventNode
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 6c47345b58066bc4f8b96f6c76775bab
+    m_Address: Assets/Datas/MapNodeDatas/TestMapNodeData.asset
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - NoneEventNode
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 530a06f2fcea6d54aa419b98c20febe5, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 0ae4d18e34ccfad4c8cc413fefd2f2c1, type: 2}
+    - {fileID: 11400000, guid: f86c1e78792db2943be239fd5abcbdd1, type: 2}

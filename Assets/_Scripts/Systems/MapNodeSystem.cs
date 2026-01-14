@@ -1,6 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceLocations;
 
 public class MapNodeSystem : Singleton<MapNodeSystem>
 {
@@ -24,6 +29,9 @@ public class MapNodeSystem : Singleton<MapNodeSystem>
     private Dictionary<int, List<MapNode>> _mapNodes = new();
     private Dictionary<int, List<MapNodeView>> _mapNodeViews = new();
     
+    private Dictionary<NodeType, List<IResourceLocation>> _mapNodeLocations = new();
+    //private List<
+    
     protected override void Awake()
     {
         base.Awake();
@@ -34,7 +42,7 @@ public class MapNodeSystem : Singleton<MapNodeSystem>
     private void Start()
     {
         if (!_isEventScene)
-            CreateMapNodes();
+            StartCoroutine(CreateMapNodes());
     }
 
     private void VarSetup()
@@ -66,7 +74,7 @@ public class MapNodeSystem : Singleton<MapNodeSystem>
         }
     }
 
-    private void CreateMapNodes()
+    private IEnumerator CreateMapNodes()
     {
         // 1. 각 단계(Level)마다 랜덤한 수의 Node를 만들도록 한다.
         for (int currentLevel = 0; currentLevel < _maxNodesLevel; currentLevel++)
@@ -77,19 +85,84 @@ public class MapNodeSystem : Singleton<MapNodeSystem>
             
             for (int i = 0; i < randomNodeCount; i++)
             {
-                MapNode newMapNode = new(currentLevel, GetRandomNodeType());
+                NodeType randomNodeType = GetRandomNodeType();
+                if (!_mapNodeLocations.ContainsKey(randomNodeType))
+                {
+                    _mapNodeLocations[randomNodeType] = new();
+                    yield return GetMapNodeDataLocations(randomNodeType, _mapNodeLocations[randomNodeType]);
+                }
+                
+                MapNode newMapNode = new(currentLevel, randomNodeType);
+                
+                yield return GetMapNodeDataAndSet(randomNodeType, newMapNode);
+                if (newMapNode.MapNodeStatus == null)
+                {
+                    Debug.Log("Failed to Set Map Node Data");
+                    continue;
+                }
+                
                 mapNodesInLevel.Add(newMapNode);
             }
             
             _mapNodes[currentLevel]= mapNodesInLevel;
         }
-
+        
         // 2. 만들어진 노드들을 연결해준다.
         ConnectMapNodes();
     }
 
+    private IEnumerator GetMapNodeDataLocations(NodeType nodeType, List<IResourceLocation> resourceLocations)
+    {
+        Debug.Log("nodeType에 따라 적절한 에셋(MapNodeData)를 로드할 수 있도록 수정하자.");
+        // 아래의 string. label?을 사용해서 해보까.
+        //string label = $"{nodeType.ToString()}NodeData";
+        
+        var handle = Addressables.LoadResourceLocationsAsync(
+            new List<object> { "NoneEventNode" },
+            Addressables.MergeMode.Intersection,
+            typeof(MapNodeData));
+        
+        yield return handle;
+
+        if (handle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Addressables.Release(handle);
+            yield break;
+        }
+        resourceLocations.AddRange(handle.Result);
+        
+        Addressables.Release(handle);
+    }
+    
+    private IEnumerator GetMapNodeDataAndSet(NodeType nodeType, MapNode mapNode)
+    {
+        if (_mapNodeLocations[nodeType].Count == 0)
+        {
+            Debug.Log($"{nodeType.ToString()}  has no map nodes.");
+            yield break;
+        }
+        
+        int randomNum = UnityEngine.Random.Range(0, _mapNodeLocations[nodeType].Count);
+        var handle = Addressables.LoadAssetAsync<MapNodeData>(_mapNodeLocations[nodeType][randomNum]);
+        
+        yield return handle;
+
+        if (handle.Status != AsyncOperationStatus.Succeeded)
+        {
+            Debug.Log("Failed to Load Map Node Data");
+            Addressables.Release(handle);
+            yield break;
+        }
+        
+        mapNode.SetMapNodeData(handle.Result);
+        
+        Addressables.Release(handle);
+    }
+
     private void ConnectMapNodes()
     {
+        // 지금은 세로로 1자로 만들어 그냥 무대포로 MapNode를 View에 할당중.
+        Debug.Log("ConnectMapNodes도 차후 바꿔줄 필요 있음.");
         Vector2 initialPos = _mapNodeStartPoint.GetComponent<RectTransform>().anchoredPosition;
         for (int currentLevel = 0; currentLevel < _maxNodesLevel; currentLevel++)
         {
@@ -97,6 +170,11 @@ public class MapNodeSystem : Singleton<MapNodeSystem>
             if (go.TryGetComponent<RectTransform>(out var rt))
             {
                 rt.anchoredPosition = initialPos + Vector2.up * currentLevel * _nodeVerticalDistance;
+            }
+
+            if (go.TryGetComponent<MapNodeView>(out var mapNodeView))
+            {
+                mapNodeView.SetMapNode(_mapNodes[currentLevel][0]);
             }
         }
     }

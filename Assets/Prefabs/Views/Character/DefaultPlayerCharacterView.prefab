@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1492353828510855285}
   - component: {fileID: 7837402462285334589}
   m_Layer: 9
-  m_Name: DefaultPlayerView
+  m_Name: DefaultPlayerCharacterView
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
