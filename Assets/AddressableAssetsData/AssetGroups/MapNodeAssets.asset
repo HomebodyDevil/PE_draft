@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: MapNodeAssets
+  m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
+  m_GroupName: MapNodeAssets
+  m_GUID: bc8ecec279b2471459408b0e4f4f0a5d
+  m_SerializeEntries:
+  - m_GUID: 23a587fb6d3d2cb4bbac814a78e43f1f
+    m_Address: Assets/Datas/MapNodeDatas/BattleMapNodes
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Battle
+    - MapNodes
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 8a5b3b8ec89c3e64e975f7241ec0caad
+    m_Address: Assets/Datas/MapNodeDatas/RestMapNodes
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - MapNodes
+    - Rest
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: 986f239a4e726ee4faad60b6e8364fe7
+    m_Address: Assets/Datas/MapNodeDatas/NoneMapNodes
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - MapNodes
+    - None
+    FlaggedDuringContentUpdateRestriction: 0
+  - m_GUID: fb03d4f70ac5b9143afee1415cb5fbdf
+    m_Address: Assets/Datas/MapNodeDatas/EliteMapNodes
+    m_ReadOnly: 0
+    m_SerializedLabels:
+    - Elite
+    - MapNodes
+    FlaggedDuringContentUpdateRestriction: 0
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 530a06f2fcea6d54aa419b98c20febe5, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 0ae4d18e34ccfad4c8cc413fefd2f2c1, type: 2}
+    - {fileID: 11400000, guid: f86c1e78792db2943be239fd5abcbdd1, type: 2}

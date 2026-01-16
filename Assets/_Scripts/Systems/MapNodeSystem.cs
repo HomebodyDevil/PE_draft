@@ -29,7 +29,7 @@ public class MapNodeSystem : Singleton<MapNodeSystem>
     private Dictionary<int, List<MapNode>> _mapNodes = new();
     private Dictionary<int, List<MapNodeView>> _mapNodeViews = new();
     
-    private Dictionary<NodeType, List<IResourceLocation>> _mapNodeLocations = new();
+    public Dictionary<NodeType, List<IResourceLocation>> MapNodeLocations { get; set; } = new();
     //private List<
     
     protected override void Awake()
@@ -76,6 +76,8 @@ public class MapNodeSystem : Singleton<MapNodeSystem>
 
     private IEnumerator CreateMapNodes()
     {
+        yield return InitializeMapNodeLocations();
+        
         // 1. 각 단계(Level)마다 랜덤한 수의 Node를 만들도록 한다.
         for (int currentLevel = 0; currentLevel < _maxNodesLevel; currentLevel++)
         {
@@ -86,11 +88,6 @@ public class MapNodeSystem : Singleton<MapNodeSystem>
             for (int i = 0; i < randomNodeCount; i++)
             {
                 NodeType randomNodeType = GetRandomNodeType();
-                if (!_mapNodeLocations.ContainsKey(randomNodeType))
-                {
-                    _mapNodeLocations[randomNodeType] = new();
-                    yield return GetMapNodeDataLocations(randomNodeType, _mapNodeLocations[randomNodeType]);
-                }
                 
                 MapNode newMapNode = new(currentLevel, randomNodeType);
                 
@@ -111,39 +108,70 @@ public class MapNodeSystem : Singleton<MapNodeSystem>
         ConnectMapNodes();
     }
 
-    private IEnumerator GetMapNodeDataLocations(NodeType nodeType, List<IResourceLocation> resourceLocations)
-    {
-        Debug.Log("nodeType에 따라 적절한 에셋(MapNodeData)를 로드할 수 있도록 수정하자.");
-        // 아래의 string. label?을 사용해서 해보까.
-        //string label = $"{nodeType.ToString()}NodeData";
-        
-        var handle = Addressables.LoadResourceLocationsAsync(
-            new List<object> { "NoneEventNode" },
-            Addressables.MergeMode.Intersection,
-            typeof(MapNodeData));
-        
-        yield return handle;
+    // /// <summary>
+    // /// 해당 NodeType으로 세팅된 SO의 location(Addressables)를 가져온다.
+    // /// </summary>
+    // /// <param name="nodeType">이 타입의 정보들을 가져온다.</param>
+    // /// <param name="resourceLocations">이 리스트에 할당하게 된다.</param>
+    // /// <returns></returns>
+    // private IEnumerator GetMapNodeDataLocations(NodeType nodeType, List<IResourceLocation> resourceLocations)
+    // {
+    //     Debug.Log("nodeType에 따라 적절한 에셋(MapNodeData)를 로드할 수 있도록 수정하자.");
+    //     // 아래의 string. label?을 사용해서 해보까.
+    //     //string label = $"{nodeType.ToString()}NodeData";
+    //     
+    //     var handle = Addressables.LoadResourceLocationsAsync(
+    //         new List<object> { nodeType.ToString(), "MapNodes" },
+    //         Addressables.MergeMode.Intersection,
+    //         typeof(MapNodeData));
+    //     
+    //     yield return handle;
+    //
+    //     if (handle.Status != AsyncOperationStatus.Succeeded)
+    //     {
+    //         Addressables.Release(handle);
+    //         yield break;
+    //     }
+    //     resourceLocations.AddRange(handle.Result);
+    //     
+    //     Addressables.Release(handle);
+    // }
 
-        if (handle.Status != AsyncOperationStatus.Succeeded)
+    public IEnumerator InitializeMapNodeLocations()
+    {
+        foreach (NodeType nodeType in Enum.GetValues(typeof(NodeType)))
         {
-            Addressables.Release(handle);
-            yield break;
-        }
-        resourceLocations.AddRange(handle.Result);
+            if (!MapNodeLocations.ContainsKey(nodeType)) MapNodeLocations.Add(nodeType, new());
+            
+            var handle = Addressables.LoadResourceLocationsAsync(
+                new List<object> { nodeType.ToString(), "MapNodes" },
+                Addressables.MergeMode.Intersection,
+                typeof(MapNodeData));
+
+            yield return handle;
+            
+            if (handle.Status != AsyncOperationStatus.Succeeded)
+            {
+                Addressables.Release(handle);
+                yield break;
+            }
+            
+            MapNodeLocations[nodeType].AddRange(handle.Result);
         
-        Addressables.Release(handle);
+            Addressables.Release(handle);
+        }
     }
     
     private IEnumerator GetMapNodeDataAndSet(NodeType nodeType, MapNode mapNode)
     {
-        if (_mapNodeLocations[nodeType].Count == 0)
+        if (MapNodeLocations[nodeType].Count == 0)
         {
-            Debug.Log($"{nodeType.ToString()}  has no map nodes.");
+            Debug.Log($"{nodeType.ToString()} has no map nodes.");
             yield break;
         }
         
-        int randomNum = UnityEngine.Random.Range(0, _mapNodeLocations[nodeType].Count);
-        var handle = Addressables.LoadAssetAsync<MapNodeData>(_mapNodeLocations[nodeType][randomNum]);
+        int randomNum = UnityEngine.Random.Range(0, MapNodeLocations[nodeType].Count);
+        var handle = Addressables.LoadAssetAsync<MapNodeData>(MapNodeLocations[nodeType][randomNum]);
         
         yield return handle;
 

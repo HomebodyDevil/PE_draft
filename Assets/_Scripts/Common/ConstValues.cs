@@ -24,4 +24,7 @@ public static class ConstValue
     public const int MAX_PERFORM_CHAIN_COUNT = 50;
 
     public const int INFINITE_TURN_COUNT = -1234;
+
+    public const int NUMBER_OF_PLAYER_CHARACTERS = 6;
+    public const int NUMBER_OF_ENEMY_CHARACTERS = 6;
 }

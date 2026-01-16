@@ -10,26 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
-  m_Name: NoneEventNode
+  m_Name: BattleEnemiesData
   m_EditorClassIdentifier: Unity.Addressables.Editor::UnityEditor.AddressableAssets.Settings.AddressableAssetGroup
-  m_GroupName: NoneEventNode
-  m_GUID: bc8ecec279b2471459408b0e4f4f0a5d
+  m_GroupName: BattleEnemiesData
+  m_GUID: 214548c14f2c0e84696e8e8e44e6137e
   m_SerializeEntries:
-  - m_GUID: 6b1c61dd5db4b83499579fbd612848f3
-    m_Address: Assets/Datas/MapNodeDatas/TestMapNodeData 1.asset
+  - m_GUID: 7c785587a92a7824e94e5ff58530233b
+    m_Address: Assets/Datas/TestBattleEnemiesData.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - NoneEventNode
-    FlaggedDuringContentUpdateRestriction: 0
-  - m_GUID: 6c47345b58066bc4f8b96f6c76775bab
-    m_Address: Assets/Datas/MapNodeDatas/TestMapNodeData.asset
-    m_ReadOnly: 0
-    m_SerializedLabels:
-    - NoneEventNode
+    - BattleEnemiesData
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 530a06f2fcea6d54aa419b98c20febe5, type: 2}
   m_SchemaSet:
     m_Schemas:
-    - {fileID: 11400000, guid: 0ae4d18e34ccfad4c8cc413fefd2f2c1, type: 2}
-    - {fileID: 11400000, guid: f86c1e78792db2943be239fd5abcbdd1, type: 2}
+    - {fileID: 11400000, guid: 97e4777201e5bd143aa3fe087014d2b9, type: 2}
+    - {fileID: 11400000, guid: 83dd21f453a7e374eb4423870a39bcfb, type: 2}

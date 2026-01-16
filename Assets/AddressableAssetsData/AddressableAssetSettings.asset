@@ -15,7 +15,7 @@ MonoBehaviour:
   m_DefaultGroup: beb77f6666cb37344b0b0d337889d89f
   m_currentHash:
     serializedVersion: 2
-    Hash: 8b16be79ecdef6202f714fc6e240881d
+    Hash: 8e9e4b06f8560ab93f24edf2bc545f6f
   m_OptimizeCatalogSize: 0
   m_BuildRemoteCatalog: 0
   m_CatalogRequestsTimeout: 0
@@ -60,6 +60,7 @@ MonoBehaviour:
   m_BuildAddressablesWithPlayerBuild: 0
   m_overridePlayerVersion: '[UnityEditor.PlayerSettings.bundleVersion]'
   m_GroupAssets:
+  - {fileID: 11400000, guid: 941b93201df56ac43ab1bd14a39a93ae, type: 2}
   - {fileID: 11400000, guid: 5ed6998b280a24f418050306ed57a1e8, type: 2}
   - {fileID: 11400000, guid: 8717f0b3107997249b451f26f81558c4, type: 2}
   - {fileID: 11400000, guid: 6ceb28dd87a0c4843a5c6b7cb0954a4f, type: 2}
@@ -110,8 +111,13 @@ MonoBehaviour:
     - Dialogue
     - CharacterView
     - SpeakerPortraitPrefab
-    - NoneEventNode
     - EnemyCharacterData
+    - BattleEnemiesData
+    - MapNodes
+    - None
+    - Battle
+    - Rest
+    - Elite
   m_SchemaTemplates: []
   m_GroupTemplateObjects:
   - {fileID: 11400000, guid: 4798a9575c16d504a8a35ac39b328ca1, type: 2}

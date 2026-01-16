@@ -5,8 +5,8 @@ using UnityEngine;
 public class PlayerStatusService : PersistantSingleton<PlayerStatusService>
 {
     [field: SerializeField] public PlayerStatus PlayerStatus { get; private set; } = null;
+    [field: SerializeField] public MapNodeStatus CurrentMapNodeStatus { get; set; } = null;
     [SerializeField] private PlayerStatusData defaultPayerStatusData;
-
     protected override void Awake()
     {
         base.Awake();

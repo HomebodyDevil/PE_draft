@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
@@ -23,16 +24,6 @@ public class EnemyCharacterViewSystem : Singleton<EnemyCharacterViewSystem>
     {
         BattleEventSystem.Instance.OnCharacterDeath -= DisableEnemyCharacterView;
     }
-
-    private void Start()
-    {
-        Setup();
-    }
-
-    private void Setup()
-    {
-        CreateEnemyCharacterView();
-    }
     
     private void EnableEnemyCharacterView(Character character)
     {
@@ -55,24 +46,43 @@ public class EnemyCharacterViewSystem : Singleton<EnemyCharacterViewSystem>
             }
         }
     }
-
-    private void CreateEnemyCharacterView()
+    
+    private void SetCharacterPositions()
     {
-        Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Views/Character/DefaultEnemyView.prefab").Completed +=
-            handle =>
+        _enemyCharacterPositions.Clear();
+        
+        string enemyMatch = @"^EnemyCharacterPosition(100|[1-9]?\d)$";
+        
+        Transform[] children = transform.GetComponentsInChildren<Transform>(true);
+
+        for (int i = 0; i < children.Length; i++)
+        {
+            if (children[i] == transform) continue;
+
+            if (Regex.IsMatch(children[i].name, enemyMatch))
             {
-                GameObject enemyViewPrefab = handle.Result;
-                for (int i = 0; i < EnemySystem.Instance.EnemyCharacters.Count; i++)
-                {
-                    GameObject go = Instantiate(enemyViewPrefab, _enemyCharacterPositions[i]);
-                    if (go.TryGetComponent<CharacterView>(out CharacterView characterView))
-                    {
-                        characterView.SetCharacter(EnemySystem.Instance.EnemyCharacters[i]);
-                        EnemyCharacterViews.Add(characterView);
-                    }
-                }
-            };
+                _enemyCharacterPositions.Add(children[i]);
+            }
+        }
     }
+
+    // private void CreateEnemyCharacterView()
+    // {
+    //     Addressables.LoadAssetAsync<GameObject>("Assets/Prefabs/Views/Character/DefaultEnemyView.prefab").Completed +=
+    //         handle =>
+    //         {
+    //             GameObject enemyViewPrefab = handle.Result;
+    //             for (int i = 0; i < EnemySystem.Instance.EnemyCharacters.Count; i++)
+    //             {
+    //                 GameObject go = Instantiate(enemyViewPrefab, _enemyCharacterPositions[i]);
+    //                 if (go.TryGetComponent<CharacterView>(out CharacterView characterView))
+    //                 {
+    //                     characterView.SetCharacter(EnemySystem.Instance.EnemyCharacters[i]);
+    //                     EnemyCharacterViews.Add(characterView);
+    //                 }
+    //             }
+    //         };
+    // }
 
     private void SetVars()
     {
@@ -83,5 +93,7 @@ public class EnemyCharacterViewSystem : Singleton<EnemyCharacterViewSystem>
             tr.GetComponentsInChildren<Transform>(true, _enemyCharacterPositions);
             _enemyCharacterPositions.Remove(tr);
         }
+
+        SetCharacterPositions();
     }
 }
