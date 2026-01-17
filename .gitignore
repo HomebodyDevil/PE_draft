@@ -13,7 +13,10 @@
 *.log
 
 # Test Datas
-/[Aa]ssets/[Mm]edias/[Tt]est[Mm]edias/
+# /[Aa]ssets/[Mm]edias/[Tt]est[Mm]edias/
+
+# Media Files
+/[Aa]ssets/[Mm]edias/
 
 # By default unity supports Blender asset imports, *.blend1 blender files do not need to be commited to version control.
 *.blend1
