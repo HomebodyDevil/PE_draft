@@ -5,6 +5,7 @@ using UnityEngine.EventSystems;
 
 public class Character
 {
+    public string CharacterName { get; private set; } = "";
     public float CurrentHealth { get; private set; }
     public float MaxHealth { get; private set; }
     public TeamType TeamType { get; private set; }

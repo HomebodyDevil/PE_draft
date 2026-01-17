@@ -4,15 +4,27 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class TestGA : GameAbility
+public class TestGAContext
 {
     public string Text { get; private set; }
+    public Transform TextObject { get; private set; }
+
+    public TestGAContext(string text, Transform textObject)
+    {
+        Text = text;
+        TextObject = textObject;
+    }
+}
+
+public class TestGA : GameAbility
+{
+    public TestGAContext TestGaContext { get; private set; }
 
     public TestGA() { }
     
-    public TestGA(string txt)
+    public TestGA(TestGAContext ctx)
     {
-        Text = txt;
+        TestGaContext = ctx;
     }
 }
 
@@ -36,8 +48,12 @@ public class DebugHelperService : PersistantSingleton<DebugHelperService>
     {
         Debug.Log("Perform Test GA");
         
-        _text.text = testGA.Text;
+        _text.text = testGA.TestGaContext.Text;
+        testGA.TestGaContext.TextObject.gameObject.SetActive(true);
+            
         yield return new WaitForSeconds(0.7f);
+        
+        testGA.TestGaContext.TextObject.gameObject.SetActive(false);
         
         _text.text = "Debug TEXT";
     }

@@ -23,6 +23,7 @@ public class MapNodeView : MonoBehaviour
             return;
         }
 
+        Debug.Log($"MapNode Type: {MapNode.NodeType.ToString()}");
         Debug.Log("PlayerStatusService의 MapNodeStatus Set.");
         PlayerStatusService.Instance.CurrentMapNodeStatus = MapNode.MapNodeStatus;
     }

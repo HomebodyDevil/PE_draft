@@ -2650,7 +2650,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCharacterViewSystem
   _playerCharacterPositions: []
-  _enemyCharacterPositions: []
 --- !u!1 &807024880
 GameObject:
   m_ObjectHideFlags: 0

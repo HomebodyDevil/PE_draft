@@ -19,7 +19,8 @@ MonoBehaviour:
     m_Address: Assets/Datas/CharactersDatas/TestEnemyCharacter.asset
     m_ReadOnly: 0
     m_SerializedLabels:
-    - EnemyCharacterData
+    - CharacterData
+    - Enemy
     FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 530a06f2fcea6d54aa419b98c20febe5, type: 2}
