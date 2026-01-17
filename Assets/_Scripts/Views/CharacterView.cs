@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using PEEnum;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -16,6 +17,8 @@ public class CharacterView : MonoBehaviour
     public Transform Text;
 
     private Coroutine _setCharacterCoroutine;
+
+    private AsyncOperationHandle<GameObject> _characterViewHandle;
     
     private void Awake()
     {
@@ -55,6 +58,8 @@ public class CharacterView : MonoBehaviour
             StopCoroutine(_setCharacterCoroutine);
             _setCharacterCoroutine = null;
         }
+        
+        if (_characterViewHandle.IsValid()) Addressables.Release(_characterViewHandle);
     }
 
     private void SetVar()
@@ -144,5 +149,10 @@ public class CharacterView : MonoBehaviour
 
         Character = new(handle.Result);
         _setCharacterCoroutine = null;
+    }
+
+    public void SetHandle(AsyncOperationHandle<GameObject> handle)
+    {
+        _characterViewHandle = handle;
     }
 }

@@ -114,12 +114,14 @@ public class EnemyCharacterViewSystem : Singleton<EnemyCharacterViewSystem>
                 Instantiate(characterViewAsset, 
                     _enemyCharacterPositions[i],
                     false);
+
+            CharacterView charView = characterViewInstance.GetComponent<CharacterView>();
+            charView.SetHandle(assetHandle);
             
-            EnemyCharacterViews.Add(characterViewInstance.GetComponent<CharacterView>());
+            EnemyCharacterViews.Add(charView);
         }
         
         Addressables.Release(locHandle);
-        Addressables.Release(characterViewAsset);
     }
     
     private void EnableEnemyCharacterView(Character character)
